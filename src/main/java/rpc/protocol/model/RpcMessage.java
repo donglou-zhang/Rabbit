@@ -1,4 +1,4 @@
-package rpc.protocol;
+package rpc.protocol.model;
 
 /**
  * RPC messages use generic message format for transferring data.

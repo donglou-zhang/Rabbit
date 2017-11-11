@@ -1,4 +1,4 @@
-package rpc.protocol;
+package rpc.protocol.model;
 
 import java.io.Serializable;
 

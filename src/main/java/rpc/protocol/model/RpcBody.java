@@ -1,4 +1,4 @@
-package rpc.protocol;
+package rpc.protocol.model;
 
 /**
  * Represents a RPC body field.
