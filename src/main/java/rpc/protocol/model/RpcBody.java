@@ -1,5 +1,13 @@
 package rpc.protocol.model;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.io.Serializable;
+import java.util.Map;
+
 /**
  * Represents a RPC body field.
  * <p>
@@ -10,6 +18,23 @@ package rpc.protocol.model;
  * @author Vincent
  * Created  on 2017/11/10.
  */
-public class RpcBody {
+@ToString
+@EqualsAndHashCode(of = {"rpcInterface", "rpcMethod", "rpcReturn", "rpcException", "rpcAttachments"})
+public class RpcBody implements Serializable{
 
+    private static final long serialVersionUID = 5138100956693144357L;
+
+    @Getter @Setter private String rpcId;
+
+    @Getter @Setter private Class<?> rpcInterface;
+
+    @Getter @Setter private RpcMethod rpcMethod;
+
+    @Getter @Setter private RpcOption rpcOption;
+
+    @Getter @Setter private Map<String, String> rpcAttachments;
+
+    @Getter @Setter private Object rpcReturn;
+
+    @Getter @Setter private Exception rpcException;
 }

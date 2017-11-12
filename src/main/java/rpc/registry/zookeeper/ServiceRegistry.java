@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CountDownLatch;
 
 
+/**
+ *  @author Vincent
+ * Created  on 2017/11/12.
+ */
 public class ServiceRegistry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);

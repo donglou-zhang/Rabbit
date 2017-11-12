@@ -42,8 +42,10 @@ import lombok.ToString;
 @EqualsAndHashCode(of = {"magic", "headerSize", "version", "st", "hb", "ow", "rp", "statusCode", "reserved", "mid", "bodySize"})
 public class RpcHeader implements Serializable{
 
-    //for java serialization, when carry out deserialization, JVM will compare the received serialVersionUID with local serialVersionUID,
-    //if same, it can be deserialized.
+    /**
+     * for java serialization, when carry out deserialization, JVM will compare the received serialVersionUID with local serialVersionUID,
+     if same, it can be deserialized.
+     */
     private static final long serialVersionUID = -67119913240566784L;
 
     private static final byte   ST_MASK            = (byte) 0x1f;
