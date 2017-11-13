@@ -1,4 +1,4 @@
-package rpc.protocol;
+package rpc.protocol.coder;
 
 import common.exception.ProtocolException;
 import common.serialization.RpcSerialization;
@@ -12,9 +12,13 @@ import rpc.protocol.model.RpcMessage;
  * @author Vincent
  * Created  on 2017/11/12.
  */
-public class RpcEncoder {
+public abstract class RpcEncoder {
 
     private SerializerRegistry serializerRegistry = SerializerRegistry.getInstance();
+
+    public RpcEncoder() {
+
+    }
 
     public byte[] encode(RpcMessage rm) throws ProtocolException {
         if(rm == null)

@@ -1,17 +1,17 @@
 package rpc.registry.zookeeper;
 
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 
 /**
- *  @author Vincent
+ * Use zookeeper to implement service registry
+ *
+ * @author Vincent
  * Created  on 2017/11/12.
  */
 public class ServiceRegistry {
@@ -43,13 +43,29 @@ public class ServiceRegistry {
         if(service != null) {
             ZooKeeper zk = connectZookeeper();
             if(zk != null) {
-
+                createNode(zk, service);
             }
         }
     }
 
     private ZooKeeper connectZookeeper() {
         ZooKeeper zk = null;
+        try{
+            String registryAddress = registerHost + ":" + String.valueOf(registerPort);
+            zk = new ZooKeeper(registryAddress, Constant.ZK_SESSION_TIMEOUT, new Watcher() {
+                @Override
+                public void process(WatchedEvent watchedEvent) {
+                    if(watchedEvent.getState() == Event.KeeperState.SyncConnected) {
+                        // make the blocked thread continue executing
+                        latch.countDown();
+                    }
+                }
+            });
+            // block current thread
+            latch.await();
+        }catch(IOException | InterruptedException e) {
+            LOGGER.error("", e);
+        }
         return zk;
     }
 

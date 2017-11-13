@@ -1,8 +1,9 @@
 package rpc.transmission;
 
 /**
- * Created by Vincent on 2017/11/11.
+ * @author Vincent
+ * Created on 2017/11/13.
  */
-public class RpcAcceptor {
+public interface RpcAcceptor {
 
 }

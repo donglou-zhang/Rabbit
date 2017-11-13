@@ -1,6 +1,6 @@
 package client;
 
-import clientStub.DefaultRpcInvoker;
+import clientStub.ClientRpcInvoker;
 import lombok.Getter;
 import lombok.Setter;
 import rpc.protocol.model.RpcMessage;
@@ -17,7 +17,7 @@ public class RpcClient {
 
     @Getter @Setter private int remotePort;
 
-    @Getter @Setter private DefaultRpcInvoker invoker;
+    @Getter @Setter private ClientRpcInvoker invoker;
 
     public RpcClient() {
 

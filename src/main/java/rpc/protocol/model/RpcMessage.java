@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * RPC messages use generic message format for transferring data.
@@ -26,6 +28,28 @@ public class RpcMessage implements Serializable{
     @Getter @Setter private RpcHeader header;
 
     @Getter @Setter private RpcBody body;
+
+    private static final AtomicLong ID_GENERATOR = new AtomicLong(0);
+
+    private static RpcMessage newRpcMessage() {
+        RpcMessage message = new RpcMessage();
+        RpcHeader header = new RpcHeader();
+        RpcBody body = new RpcBody();
+        message.setHeader(header);
+        message.setBody(body);
+        return message;
+    }
+
+    public static RpcMessage newRequestMessage(Class<?> rpcInterface, String methodName, Class<?>[] parameterTypes, Object[] parameters) {
+        RpcMessage request = newRpcMessage();
+        request.setMid(ID_GENERATOR.incrementAndGet());
+        RpcBody body = request.getBody();
+        body.setRpcInterface(rpcInterface);
+        RpcMethod rpcMethod = new RpcMethod(methodName, parameterTypes, parameters);
+        body.setRpcMethod(rpcMethod);
+        body.setRpcOption(new RpcOption());
+        return request;
+    }
 
     public boolean isOneWay() {
         return header.isOw();
@@ -60,6 +84,18 @@ public class RpcMessage implements Serializable{
 
     public void setMid(long id) {
         header.setMid(id);
+    }
+
+    public String getRpcId() {
+        return body.getRpcId();
+    }
+
+    public void setRpcId(String id) {
+        body.setRpcId(id);
+    }
+
+    public void setRpcAttachments(Map<String, String> attachments) {
+        body.setRpcAttachments(attachments);
     }
 
     public Exception getException() {

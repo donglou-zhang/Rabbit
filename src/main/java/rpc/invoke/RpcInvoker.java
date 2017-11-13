@@ -1,4 +1,4 @@
-package clientStub;
+package rpc.invoke;
 
 import common.exception.RpcException;
 import rpc.protocol.model.RpcMessage;
@@ -28,7 +28,8 @@ public interface RpcInvoker {
     RpcMessage invoke(RpcMessage request) throws RpcException;
 
     /**
-     * Set rpc connector. Only client side invoker need implement this method
+     * Set rpc connector.
+     * Only client side invoker need implement this method
      *
      * @param connector
      */
@@ -36,6 +37,7 @@ public interface RpcInvoker {
 
     /**
      * Set rpc registry
+     * Used in the server side
      *
      * @param registry
      */
