@@ -23,22 +23,18 @@ public abstract class AbstractRpcConnector implements RpcConnector{
         this.remotePort = remotePort;
     }
 
-    @Override
     public long connect() throws RpcException {
         return 0;
     }
 
-    @Override
     public boolean disconnect(long connectionId) {
         return false;
     }
 
-    @Override
     public RpcMessage send(RpcMessage request, boolean async) throws Exception {
         return null;
     }
 
-    @Override
     public int getRpcTimeoutInMillis() {
         return 0;
     }

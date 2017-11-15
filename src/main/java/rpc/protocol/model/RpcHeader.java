@@ -2,6 +2,7 @@ package rpc.protocol.model;
 
 import java.io.Serializable;
 
+import common.util.ByteUtil;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,7 @@ import lombok.ToString;
  * status code: response message status code
  * reserved: for byte alignment
  *
- * st = serialization type.
+ * st = serialization type.(from 40 to 44)
  * hb = heartbeat flag, set '0000 0100' means it is a heartbeat message, designed for long connection.
  * ow = one way   flag, set '0000 0010' means it is one way message, the client doesn't wait for a response.
  * rp = response  flag, set '0000 0001' means it is response message, otherwise it's a request message.
@@ -48,11 +49,13 @@ public class RpcHeader implements Serializable{
      */
     private static final long serialVersionUID = -67119913240566784L;
 
-    private static final byte   ST_MASK            = (byte) 0x1f;
-    private static final byte   HB_MASK            = (byte) 0x20;
-    private static final byte   OW_MASK            = (byte) 0x40;
-    private static final byte   RP_MASK            = (byte) 0x80;
+    private static final byte   ST_MASK            = (byte) 0xf8;
+    private static final byte   HB_MASK            = (byte) 0x04;
+    private static final byte   OW_MASK            = (byte) 0x02;
+    private static final byte   RP_MASK            = (byte) 0x01;
     public  static final short  MAGIC              = (short) 0xcaf6;
+    public  static final byte MAGIC_BIT_0 = ByteUtil.shortToBytes(MAGIC)[0];
+    public  static final byte MAGIC_BIT_1 = ByteUtil.shortToBytes(MAGIC)[1];
     public  static final short  HEADER_SIZE        = (short) 20;
     public  static final byte   VERSION            = (byte)  1;
 

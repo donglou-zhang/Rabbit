@@ -6,7 +6,7 @@ import common.exception.ProtocolException;
  * Serialize object to bytes or deserialize object from bytes
  *
  * @author Vincent
- * Created  on 2017/11/12.
+ * Created on 2017/11/12.
  */
 public interface RpcSerialization {
 

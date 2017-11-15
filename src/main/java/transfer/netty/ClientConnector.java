@@ -7,8 +7,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rpc.protocol.coder.NettyRpcDecoder;
-import rpc.protocol.coder.NettyRpcEncoder;
+import rpc.protocol.codec.NettyRpcDecoder;
+import rpc.protocol.codec.NettyRpcEncoder;
 import rpc.protocol.model.RpcMessage;
 import rpc.transmission.AbstractRpcConnector;
 
@@ -25,7 +25,7 @@ public class ClientConnector extends AbstractRpcConnector {
 
     public RpcMessage send(RpcMessage request, boolean async) throws InterruptedException {
         EventLoopGroup group = new NioEventLoopGroup();
-        ResultHandler resultHandler = new ResultHandler();
+        final ResultHandler resultHandler = new ResultHandler();
         try {
             Bootstrap bs = new Bootstrap();
             bs.group(group).channel(NioSocketChannel.class)
