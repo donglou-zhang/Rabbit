@@ -1,6 +1,17 @@
 package common.serialization;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 import common.exception.ProtocolException;
+import common.util.Assert;
+import rpc.protocol.model.RpcBody;
+import rpc.protocol.model.RpcHeader;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.ref.SoftReference;
 
 /**
  * Use the third-party serialization
@@ -24,6 +35,35 @@ public class KryoSerializer implements RpcSerialization {
     private KryoSerializer() {}
 
     /**
+     * SoftReference won't prevent the garbage collection and it holds a soft reference of object
+     * It provides <code>get()</> method to get the strong reference of the object
+     */
+    private static final ThreadLocal<SoftReference<Kryo>> CACHE = new ThreadLocal<SoftReference<Kryo>>() {
+        @Override
+        protected SoftReference<Kryo> initialValue() {
+            Kryo kryo = newKryo();
+            return super.initialValue();
+        }
+    };
+
+    private static Kryo newKryo() {
+        Kryo kryo = new Kryo();
+//        kryo.register(RpcHeader.class);
+        kryo.register(RpcBody.class);
+        kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
+        return kryo;
+    }
+
+    private Kryo kryo() {
+        Kryo kryo = CACHE.get().get();
+        if(kryo == null) {
+            kryo = newKryo();
+            CACHE.set(new SoftReference<Kryo>(kryo));
+        }
+        return kryo;
+    }
+
+    /**
      * kryo serializer is the preferred serialization
      *
      * @return
@@ -35,16 +75,25 @@ public class KryoSerializer implements RpcSerialization {
 
     @Override
     public byte[] serialize(Object obj) throws ProtocolException {
-        return new byte[0];
+        Assert.notNull(obj);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Output output = new Output(baos);
+        kryo().writeObject(output, obj);
+        return baos.toByteArray();
     }
 
     @Override
     public Object deserialize(byte[] data) throws ProtocolException {
-        return null;
+        return deserialize(data, 0);
     }
 
     @Override
     public Object deserialize(byte[] data, int off) throws ProtocolException {
-        return null;
+        Assert.notNull(data);
+        ByteArrayInputStream bais = new ByteArrayInputStream(data, off, data.length - off);
+        Input input = new Input(bais);
+        RpcBody rpcBody = kryo().readObject(input, RpcBody.class);
+        input.close();
+        return rpcBody;
     }
 }

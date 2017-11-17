@@ -1,17 +1,23 @@
 package rpc.registry.zookeeper;
 
+import lombok.NonNull;
+import org.I0Itec.zkclient.IZkChildListener;
+import org.I0Itec.zkclient.IZkStateListener;
+import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rpc.registry.RpcDiscovery;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 /**
  * Discover and get the registry service
@@ -19,91 +25,125 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author Vincent
  * Created  on 2017/11/12.
  */
-public class ServiceDiscovery {
+public class ServiceDiscovery implements RpcDiscovery{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceDiscovery.class);
 
-    private CountDownLatch latch = new CountDownLatch(1);
+    private volatile Map<String, List<String>> serviceMap = new HashMap<>();
 
-    private volatile List<String> dataList = new ArrayList<>();
+    private IZkChildListener zkChildListener = new ZkChildListener();
 
-    private String registerHost;
+    private Map<String, IZkChildListener> serviceListeners = new ConcurrentHashMap<>();
+
+    private ZkClient zkClient;
+
+    private String registerAddr;
+
+    private boolean isInitialized = false;
 
     public ServiceDiscovery(String host, int port) {
-        this.registerHost = host;
-        this.registerPort = port;
-
-        ZooKeeper zk = connectServer();
-        if(zk != null) {
-            monitorNode(zk);
-        }
+        this.registerAddr = host + ":" + String.valueOf(port);
+        init();
     }
 
-    private ZooKeeper connectServer() {
-        ZooKeeper zk = null;
-        try {
-            String registryAddress = registerHost + ":" + String.valueOf(registerPort);
-            zk = new ZooKeeper(registryAddress, Constant.ZK_SESSION_TIMEOUT, new Watcher() {
-                @Override
-                public void process(WatchedEvent watchedEvent) {
-                    if(watchedEvent.getState() == Event.KeeperState.SyncConnected) {
-                        latch.countDown();
-                    }
-                }
-            });
-            latch.await();
-        }catch(IOException | InterruptedException e) {
-            LOGGER.error("", e);
+    private void init() {
+        if(isInitialized) {
+            return;
         }
-        return zk;
+
+        isInitialized = true;
+        zkClient = new ZkClient(this.registerAddr);
+
+        LOGGER.info("Connect to zookeeper server: [{}]", this.registerAddr);
+
+        zkClient.subscribeStateChanges(new IZkStateListener() {
+            @Override
+            public void handleStateChanged(Watcher.Event.KeeperState keeperState) throws Exception {
+                monitorNode(zkClient);
+            }
+
+            @Override
+            public void handleNewSession() throws Exception {
+                monitorNode(zkClient);
+            }
+        });
     }
+
+
 
     /**
      * Monitor the zookeeper node to update service data on time
      *
-     * @param zk
+     * @param zkClient
      */
-    private void monitorNode(final ZooKeeper zk) {
-        try {
-            List<String> nodeList = zk.getChildren(Constant.ZK_REGISTRY_PATH, new Watcher() {
-                @Override
-                public void process(WatchedEvent watchedEvent) {
-                    if(watchedEvent.getType() == Event.EventType.NodeChildrenChanged) {
-                        monitorNode(zk);
-                    }
+    private void monitorNode(@NonNull final ZkClient zkClient) {
+        //TODO need to get the application
+        String application = "";
+
+        String path = Constant.ZK_REGISTRY_PATH + "/" + application;
+
+        List<String> serviceList = zkClient.getChildren(path);
+
+        if(serviceList.isEmpty()) {
+            LOGGER.warn("Can not find any address node on path: [{}]. Please check your zookeeper service :( \n", path);
+        } else {
+            for(String service : serviceList) {
+                List<String> nodes = this.discoverAll(application, service);
+                if(nodes != null && !nodes.isEmpty()) {
+                    serviceMap.put(path+"/"+service, nodes);
                 }
-            });
-            List<String> dataList = new ArrayList<>();
-            for(String node : nodeList) {
-                byte[] bytes = zk.getData(Constant.ZK_REGISTRY_PATH + "/" + node, false, null);
-                dataList.add(new String(bytes));
             }
-            LOGGER.debug("node data : {}", dataList);
-            this.dataList = dataList;
-        }catch(KeeperException | InterruptedException e) {
-            LOGGER.error("", e);
+
+            // updated node list
+            if(!serviceMap.values().isEmpty()) {
+                LOGGER.debug("Update node list: {}", serviceMap.values().stream().flatMap(Collection::stream).distinct().collect(Collectors.toList()));
+            }
         }
     }
 
-    /**
-     * Get the data from zookeeper
-     *
-     * @return
-     */
-    public String discover() {
-        String data = null;
-        int size = this.dataList.size();
-
-        //TODO can do "load balancing"
-        if(size == 1) {
-            data = this.dataList.get(0);
-            LOGGER.debug("Using only data : {}", data);
-        }else {
-            data = this.dataList.get(ThreadLocalRandom.current().nextInt(size));
-            LOGGER.debug("Using random data : {}", data);
-        }
-        return data;
+    @Override
+    public String discover(String service) {
+        return null;
     }
 
-    private int registerPort;
+    @Override
+    public String discover(String application, String service) {
+        //TODO load balancing according to weight
+
+        return null;
+    }
+
+    @Override
+    public List<String> discoverAll(String service) {
+        return null;
+    }
+
+    @Override
+    public List<String> discoverAll(String application, String rpcInterface) {
+        String servicePath = Constant.ZK_REGISTRY_PATH + "/" + application + "/" + rpcInterface;
+
+        List<String> children = null;
+        if(zkClient.exists(servicePath)) {
+            //All the children's path don't contain the prefix path(application/rpcInterface)
+            children = zkClient.getChildren(servicePath);
+        }
+
+        if(!serviceListeners.containsKey(servicePath)) {
+            serviceListeners.put(servicePath, zkChildListener);
+            // For each service path(application/rpcInterface), monitor it's children changes.
+            zkClient.subscribeChildChanges(servicePath, zkChildListener);
+        }
+        return children;
+    }
+
+    class ZkChildListener implements IZkChildListener {
+
+        @Override
+        public void handleChildChange(String parentPath, List<String> currentChildren) throws Exception {
+            if(currentChildren != null && !currentChildren.isEmpty()) {
+                monitorNode(zkClient);
+            }
+        }
+    }
+
 }

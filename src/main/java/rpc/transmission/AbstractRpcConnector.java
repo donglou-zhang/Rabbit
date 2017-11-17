@@ -31,7 +31,7 @@ public abstract class AbstractRpcConnector implements RpcConnector{
         return false;
     }
 
-    public RpcMessage send(RpcMessage request, boolean async) throws Exception {
+    public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
         return null;
     }
 

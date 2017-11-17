@@ -25,9 +25,13 @@ public class RpcInvocationHandler implements InvocationHandler{
         Class<?> rpcInterface = method.getDeclaringClass();
         String methodName = method.getName();
         Class<?>[] parameterTypes = method.getParameterTypes();
-        Object[] parameters = args;
-        RpcMessage request = RpcMessage.newRequestMessage(rpcInterface, methodName, parameterTypes, parameters);
+        RpcMessage request = RpcMessage.newRequestMessage(rpcInterface, methodName, parameterTypes, args);
 
-        return null;
+        LOGGER.debug("[Rabbit] Rpc client proxy before invocation, | request = {}", request);
+        RpcMessage response = rpcInvoker.invoke(request);
+        LOGGER.debug("[Rabbit] Rpc client proxy before invocation, | request = {}", response);
+
+        return RpcMessage.unpackResponseMessage(response);
+
     }
 }

@@ -1,5 +1,6 @@
 package transfer.netty;
 
+import common.exception.RpcException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -23,9 +24,10 @@ public class ClientConnector extends AbstractRpcConnector {
 
     private static final Object lock  = new Object();
 
-    public RpcMessage send(RpcMessage request, boolean async) throws InterruptedException {
+    public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
         EventLoopGroup group = new NioEventLoopGroup();
         final ResultHandler resultHandler = new ResultHandler();
+        RpcMessage response = null;
         try {
             Bootstrap bs = new Bootstrap();
             bs.group(group).channel(NioSocketChannel.class)
@@ -49,15 +51,17 @@ public class ClientConnector extends AbstractRpcConnector {
             }
 
             // After get the response, free all the source
-            RpcMessage response = resultHandler.getResponse();
+            response = resultHandler.getResponse();
             if(response != null) {
                 future.channel().closeFuture().sync();
             }
 
-            return response;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         } finally {
             group.shutdownGracefully();
         }
+        return response;
     }
 
     /**

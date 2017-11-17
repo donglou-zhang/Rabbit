@@ -51,6 +51,27 @@ public class RpcMessage implements Serializable{
         return request;
     }
 
+    /**
+     * Unpack the response message, if it has exception, then throw the exception
+     * Get the "return object" and return it.
+     *
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public static Object unpackResponseMessage(RpcMessage response) throws Exception{
+        if(response == null) {
+            return null;
+        }
+
+        Exception e = response.getException();
+        if(e != null) {
+            throw e;
+        }
+
+        return response.getRpcReturn();
+    }
+
     public boolean isOneWay() {
         return header.isOw();
     }
@@ -112,5 +133,13 @@ public class RpcMessage implements Serializable{
 
     public void setRpcTimeoutInMillis(int rpcTimeoutInMillis) {
         body.getRpcOption().setRpcTimeoutInMillis(rpcTimeoutInMillis);
+    }
+
+    public Object getRpcReturn() {
+        return body.getRpcReturn();
+    }
+
+    public void setRpcReturn(Object obj) {
+        body.setRpcReturn(obj);
     }
 }

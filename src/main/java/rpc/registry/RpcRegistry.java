@@ -6,5 +6,7 @@ package rpc.registry;
  */
 public interface RpcRegistry {
 
-    void register(byte[] data);
+    void register(RpcRegistryService service);
+
+    void unregister(RpcRegistryService service);
 }

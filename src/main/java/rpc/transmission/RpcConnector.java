@@ -22,7 +22,7 @@ public interface RpcConnector {
      * @return
      * @throws RpcException
      */
-    RpcMessage send(RpcMessage request, boolean async) throws Exception;
+    RpcMessage send(RpcMessage request, boolean async) throws RpcException;
 
     /**
      * @return global setting rpc timeout in millis
