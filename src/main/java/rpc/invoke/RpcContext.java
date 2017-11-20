@@ -1,4 +1,4 @@
-package clientStub;
+package rpc.invoke;
 
 import lombok.Getter;
 import lombok.Setter;

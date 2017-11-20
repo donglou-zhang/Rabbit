@@ -1,6 +1,8 @@
 package rpc.registry.zookeeper;
 
 import common.exception.RpcException;
+import lombok.Getter;
+import lombok.Setter;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.*;
 import org.slf4j.Logger;
@@ -23,6 +25,12 @@ public class ServiceRegistry implements RpcRegistry{
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);
 
     private ZkClient zkClient;
+
+    @Getter @Setter private String registerHost;
+
+    @Getter @Setter private int registerPort;
+
+    public ServiceRegistry() {}
 
     /**
      * register service at the machine with (host, port)url, like zk(127.0.0.1:2181)

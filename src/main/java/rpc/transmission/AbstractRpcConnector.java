@@ -14,8 +14,11 @@ public abstract class AbstractRpcConnector implements RpcConnector{
 
     @Getter private int remotePort;
 
-    public AbstractRpcConnector() {
+    public AbstractRpcConnector() {}
 
+    public AbstractRpcConnector(String remoteHost, int remotePort) {
+        this.remoteHost = remoteHost;
+        this.remotePort = remotePort;
     }
 
     public void setRemoteAddress(String remoteHost, int remotePort) {

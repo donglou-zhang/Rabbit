@@ -1,5 +1,6 @@
 package serverStub;
 
+import rpc.invoke.RpcInvoker;
 import rpc.protocol.model.RpcMessage;
 
 /**
@@ -9,4 +10,6 @@ import rpc.protocol.model.RpcMessage;
 public interface RpcProcessor {
 
     void process(RpcMessage request);
+
+    void setInvoker(RpcInvoker invoker);
 }

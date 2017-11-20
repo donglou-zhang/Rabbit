@@ -18,7 +18,7 @@ import rpc.protocol.model.RpcMessage;
  */
 public class DefaultRpcEncoder {
 
-    private SerializerRegistry serializerRegistry = SerializerRegistry.getInstance();
+    private static SerializerRegistry serializerRegistry = SerializerRegistry.getInstance();
 
     public DefaultRpcEncoder() {
 

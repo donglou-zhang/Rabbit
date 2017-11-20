@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rpc.invoke.AbstractRpcInvoker;
+import rpc.invoke.RpcContext;
 import rpc.protocol.model.RpcMessage;
 import rpc.transmission.RpcConnector;
 
@@ -21,6 +22,7 @@ public class ClientRpcInvoker extends AbstractRpcInvoker {
 
     @Getter @Setter private RpcConnector connector;
 
+    @Override
     public RpcMessage invoke(RpcMessage request) {
         try {
             //the context of current thread

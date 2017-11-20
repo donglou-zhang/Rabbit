@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -49,6 +50,14 @@ public class RpcMessage implements Serializable{
         body.setRpcMethod(rpcMethod);
         body.setRpcOption(new RpcOption());
         return request;
+    }
+
+    public static RpcMessage newResponseMessage(long id, Object returnObject) {
+        RpcMessage response = newRpcMessage();
+        response.setMid(id);
+        response.setResponse(true);
+        response.setRpcReturn(returnObject);
+        return response;
     }
 
     /**
@@ -119,6 +128,10 @@ public class RpcMessage implements Serializable{
         body.setRpcAttachments(attachments);
     }
 
+    public Map<String, String> getRpcAttachments() {
+        return body.getRpcAttachments();
+    }
+
     public Exception getException() {
         return body.getRpcException();
     }
@@ -141,5 +154,21 @@ public class RpcMessage implements Serializable{
 
     public void setRpcReturn(Object obj) {
         body.setRpcReturn(obj);
+    }
+
+    public void setServerAddress(InetSocketAddress serverAddress) {
+        body.getRpcOption().setServerAddress(serverAddress);
+    }
+
+    public InetSocketAddress getServerAddress() {
+        return body.getRpcOption().getServerAddress();
+    }
+
+    public void setClientAddress(InetSocketAddress clientAddress) {
+        body.getRpcOption().setClientAddress(clientAddress);
+    }
+
+    public InetSocketAddress getClientAddress() {
+        return body.getRpcOption().getClientAddress();
     }
 }

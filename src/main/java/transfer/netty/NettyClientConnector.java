@@ -18,11 +18,22 @@ import rpc.transmission.AbstractRpcConnector;
  * @author Vincent
  * Created  on 2017/11/13.
  */
-public class ClientConnector extends AbstractRpcConnector {
+public class NettyClientConnector extends AbstractRpcConnector {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ClientConnector.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NettyClientConnector.class);
 
     private static final Object lock  = new Object();
+
+    private String remoteHost;
+
+    private int remotePort;
+
+    public NettyClientConnector() {}
+
+    public NettyClientConnector(String host, int port) {
+        this.remoteHost = host;
+        this.remotePort = port;
+    }
 
     public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
         EventLoopGroup group = new NioEventLoopGroup();
@@ -36,13 +47,13 @@ public class ClientConnector extends AbstractRpcConnector {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             ChannelPipeline cp = socketChannel.pipeline();
-                            cp.addLast("RpcMessageEncoder", new NettyRpcEncoder());
-                            cp.addLast("RpcMessageDecoder", new NettyRpcDecoder());
+                            cp.addLast("RpcMessageEncoder", new NettyRpcEncoder(RpcMessage.class));
+                            cp.addLast("RpcMessageDecoder", new NettyRpcDecoder(RpcMessage.class));
                             cp.addLast("ResultHandler", resultHandler);
                         }
                     });
 
-            ChannelFuture future = bs.connect(getRemoteHost(), getRemotePort()).sync();
+            ChannelFuture future = bs.connect(this.remoteHost, this.remotePort).sync();
             future.channel().writeAndFlush(request).sync();
 
             // Use lock to wait for the response

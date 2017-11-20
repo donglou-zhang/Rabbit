@@ -1,10 +1,9 @@
-package serverStub;
+package rpc.invoke;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rpc.invoke.RpcInvoker;
 import rpc.protocol.model.RpcMessage;
 
 import java.lang.reflect.InvocationHandler;
