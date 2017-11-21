@@ -124,6 +124,22 @@ public class RpcMessage implements Serializable{
         body.setRpcId(id);
     }
 
+    public Class<?> getRpcInterface() {
+        return body.getRpcInterface();
+    }
+
+    public void setRpcInterface(Class<?> rpcInterface) {
+        body.setRpcInterface(rpcInterface);
+    }
+
+    public String getApplication() {
+        return body.getApplication();
+    }
+
+    public void setApplication(String application) {
+        body.setApplication(application);
+    }
+
     public void setRpcAttachments(Map<String, String> attachments) {
         body.setRpcAttachments(attachments);
     }

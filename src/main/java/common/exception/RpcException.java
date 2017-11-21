@@ -15,7 +15,9 @@ public final class RpcException extends RuntimeException{
 
     private static final long serialVersionUID = -4168884981656035910L;
 
+    public static final byte UNKNOWN = 0;
     public static final byte SERVER_ERROR = 50;
+    public static final byte SERVER_TIMEOUT = 51;
 
     @Getter private byte code;
 

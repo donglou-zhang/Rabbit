@@ -4,6 +4,8 @@ import rpc.invoke.RpcInvoker;
 import rpc.registry.RpcRegistry;
 import rpc.transmission.RpcConnector;
 
+import java.util.Map;
+
 /**
  *
  * @author Vincent
@@ -16,4 +18,7 @@ public abstract class AbstractRpcInvoker implements RpcInvoker {
 
     @Override
     public void setRegistry(RpcRegistry registry) {}
+
+    @Override
+    public void setServiceBeanMap(Map<String, Object> map) {}
 }

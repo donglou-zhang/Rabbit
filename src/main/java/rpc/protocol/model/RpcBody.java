@@ -26,6 +26,8 @@ public class RpcBody implements Serializable{
 
     @Getter @Setter private String rpcId;
 
+    @Getter @Setter private String application;
+
     @Getter @Setter private Class<?> rpcInterface;
 
     @Getter @Setter private RpcMethod rpcMethod;

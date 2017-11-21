@@ -27,4 +27,12 @@ public interface RpcAcceptor {
      * @param connections
      */
     void setConnections(int connections);
+
+    /**
+     * Set the server host and port
+     *
+     * @param host
+     * @param port
+     */
+    void setAddress(String host, int port);
 }

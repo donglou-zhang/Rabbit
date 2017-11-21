@@ -8,6 +8,8 @@ import rpc.protocol.model.RpcMessage;
 import java.util.List;
 
 /**
+ * when use netty to transfer data, this class is in charge of decode.
+ *
  * @author Vincent
  * Created  on 2017/11/13.
  */

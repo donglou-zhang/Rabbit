@@ -5,6 +5,8 @@ import rpc.protocol.model.RpcMessage;
 import rpc.registry.RpcRegistry;
 import rpc.transmission.RpcConnector;
 
+import java.util.Map;
+
 /**
  * Rpc invoker, launch the rpc invocation
  *
@@ -42,4 +44,11 @@ public interface RpcInvoker {
      * @param registry
      */
     void setRegistry(RpcRegistry registry);
+
+    /**
+     * Set the rpcInterface and its implementation bean mapping.
+     *
+     * @param map
+     */
+    void setServiceBeanMap(Map<String, Object> map);
 }

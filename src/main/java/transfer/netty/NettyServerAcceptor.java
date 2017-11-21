@@ -30,6 +30,8 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
 
     @Getter @Setter private RpcProcessor processor;
 
+    public NettyServerAcceptor() {}
+
     public NettyServerAcceptor(String serverHost, int serverPort) {
         this.serverHost = serverHost;
         this.serverPort = serverPort;
@@ -64,6 +66,12 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
         }
     }
 
+    public void setAddress(String serverHost, int serverPort) {
+        this.serverHost = serverHost;
+        this.serverPort = serverPort;
+    }
+
+    //TODO explain how the response message of server return back to client through netty
     class ServerResultHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

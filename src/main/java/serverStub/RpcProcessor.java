@@ -2,6 +2,7 @@ package serverStub;
 
 import rpc.invoke.RpcInvoker;
 import rpc.protocol.model.RpcMessage;
+import rpc.transmission.RpcChannel;
 
 /**
  * @author Vincent
@@ -9,7 +10,7 @@ import rpc.protocol.model.RpcMessage;
  */
 public interface RpcProcessor {
 
-    void process(RpcMessage request);
+    RpcMessage process(RpcMessage request, RpcChannel channel);
 
     void setInvoker(RpcInvoker invoker);
 }

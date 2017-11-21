@@ -29,12 +29,12 @@ public class ServerRpcInvoker implements RpcInvoker {
 
     @Getter @Setter private RpcRegistry registry;
 
-    @Getter @Setter private Map<String, Object> handlerMap;
+    @Getter @Setter private Map<String, Object> serviceBeanMap;
 
     public ServerRpcInvoker() {}
 
     public ServerRpcInvoker(Map<String, Object> map) {
-        this.handlerMap = map;
+        this.serviceBeanMap = map;
     }
 
     /**
@@ -53,7 +53,7 @@ public class ServerRpcInvoker implements RpcInvoker {
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] params = method.getParameters();
 
-        Object serviceBean = handlerMap.get(rpcInterface);
+        Object serviceBean = serviceBeanMap.get(rpcInterface);
         if(serviceBean == null) {
             throw new RpcException("Can not find the corresponding service bean.");
         }
@@ -66,9 +66,11 @@ public class ServerRpcInvoker implements RpcInvoker {
 
             LOGGER.debug("[Rabbit] Rpc server invoker is invoking, | rpcContext = {} |", context);
 
+            //jdk dynamic proxy
             MethodAccess methodAccess = MethodAccess.get(rpcInterface);
             int methodIndex = methodAccess.getIndex(methodName, parameterTypes);
             Object returnObject = methodAccess.invoke(serviceBean, methodIndex, params);
+            
             return RpcMessage.newResponseMessage(request.getMid(), returnObject);
         } catch(Exception e) {
             LOGGER.warn("[Rabbit] Rpc server invoker error", e);

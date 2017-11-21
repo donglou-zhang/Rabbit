@@ -23,5 +23,5 @@ public interface MonitoringExecutorService extends ExecutorService {
     /**
      * @return the approximate completed task count
      */
-    int getCompleTaskCount();
+    long getCompleteTaskCount();
 }
