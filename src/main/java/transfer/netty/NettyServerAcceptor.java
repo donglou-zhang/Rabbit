@@ -13,6 +13,8 @@ import rpc.protocol.codec.NettyRpcDecoder;
 import rpc.protocol.codec.NettyRpcEncoder;
 import rpc.protocol.model.RpcMessage;
 import rpc.transmission.AbstractRpcAcceptor;
+import rpc.transmission.DefaultRpcChannel;
+import rpc.transmission.RpcChannel;
 import serverStub.RpcProcessor;
 
 /**
@@ -75,7 +77,7 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
     class ServerResultHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            processor.process((RpcMessage) msg);
+            processor.process((RpcMessage) msg, new DefaultRpcChannel());
         }
 
         @Override

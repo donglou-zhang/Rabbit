@@ -6,12 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import rpc.invoke.AbstractRpcInvoker;
 import rpc.invoke.RpcContext;
-import rpc.invoke.RpcInvoker;
 import rpc.protocol.model.RpcMessage;
 import rpc.protocol.model.RpcMethod;
 import rpc.registry.RpcRegistry;
-import rpc.transmission.RpcConnector;
 
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -23,7 +22,7 @@ import java.util.Map;
  * @author Vincent
  * Created  on 2017/11/16.
  */
-public class ServerRpcInvoker implements RpcInvoker {
+public class ServerRpcInvoker extends AbstractRpcInvoker {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServerRpcInvoker.class);
 
@@ -70,7 +69,7 @@ public class ServerRpcInvoker implements RpcInvoker {
             MethodAccess methodAccess = MethodAccess.get(rpcInterface);
             int methodIndex = methodAccess.getIndex(methodName, parameterTypes);
             Object returnObject = methodAccess.invoke(serviceBean, methodIndex, params);
-            
+
             return RpcMessage.newResponseMessage(request.getMid(), returnObject);
         } catch(Exception e) {
             LOGGER.warn("[Rabbit] Rpc server invoker error", e);
@@ -107,10 +106,5 @@ public class ServerRpcInvoker implements RpcInvoker {
             return false;
         }
         return false;
-    }
-
-    @Override
-    public void setConnector(RpcConnector connector) {
-
     }
 }
