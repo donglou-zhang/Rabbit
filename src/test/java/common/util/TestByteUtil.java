@@ -1,11 +1,15 @@
 package common.util;
 
-import common.test.CaseCounter;
+import com.rabbit.zl.common.test.CaseCounter;
+import com.rabbit.zl.common.util.ByteUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * Test for {@link ByteUtil}
+ *
+ * @author Vincent
+ * Created  on 2017/11/16.
  */
 public class TestByteUtil {
 
