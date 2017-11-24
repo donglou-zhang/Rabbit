@@ -18,6 +18,7 @@ public class RpcOption implements Serializable {
 
     private static final long serialVersionUID = -9035174922898235358L;
 
+    // transient means this member variables won't be serialized
     @Getter @Setter transient private InetSocketAddress serverAddress;
 
     @Getter @Setter transient private InetSocketAddress clientAddress;

@@ -41,7 +41,7 @@ public class KryoSerializer implements RpcSerialization {
         @Override
         protected SoftReference<Kryo> initialValue() {
             Kryo kryo = newKryo();
-            return super.initialValue();
+            return new SoftReference<Kryo>(kryo);
         }
     };
 
@@ -54,6 +54,9 @@ public class KryoSerializer implements RpcSerialization {
     }
 
     private Kryo kryo() {
+        if(CACHE.get() == null) {
+            throw new RuntimeException("ThreadLocal<SoftReference<Kryo>> CACHE is null");
+        }
         Kryo kryo = CACHE.get().get();
         if(kryo == null) {
             kryo = newKryo();

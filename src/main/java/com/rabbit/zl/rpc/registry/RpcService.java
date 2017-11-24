@@ -19,4 +19,8 @@ import java.lang.annotation.Target;
 public @interface RpcService {
 
     Class<?> value();
+
+    String version() default "1.0.0";
+
+    int weight() default 1;
 }
