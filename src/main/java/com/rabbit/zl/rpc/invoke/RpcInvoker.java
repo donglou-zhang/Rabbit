@@ -1,6 +1,7 @@
 package com.rabbit.zl.rpc.invoke;
 
 import com.rabbit.zl.common.exception.RpcException;
+import com.rabbit.zl.rpc.registry.RpcDiscovery;
 import com.rabbit.zl.rpc.registry.RpcRegistry;
 import com.rabbit.zl.rpc.transmission.RpcConnector;
 import com.rabbit.zl.rpc.protocol.model.RpcMessage;
@@ -41,9 +42,18 @@ public interface RpcInvoker {
      * Set rpc registry
      * Used in the server side
      *
+     *
      * @param registry
      */
     void setRegistry(RpcRegistry registry);
+
+    /**
+     * Set rpc discovery
+     * Used in the client side
+     *
+     * @param discovery
+     */
+    void setDiscovery(RpcDiscovery discovery);
 
     /**
      * Set the rpcInterface and its implementation bean mapping.

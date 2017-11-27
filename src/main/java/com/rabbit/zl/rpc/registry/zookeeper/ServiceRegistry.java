@@ -29,6 +29,8 @@ public class ServiceRegistry implements RpcRegistry {
     @Getter @Setter private int registerPort;
 
     public ServiceRegistry(String registryHost, int registryPort) {
+        this.registerHost = registryHost;
+        this.registerPort = registryPort;
         this.zkClient =  new ZkClient(registryHost + ":" + String.valueOf(registryPort));
         System.out.println("zookeeper connect: " + registryHost+":"+registryPort);
     }
@@ -42,7 +44,8 @@ public class ServiceRegistry implements RpcRegistry {
         if(service == null) {
             throw new RpcException("Registry service is null, please check!");
         }
-        removeNode(service);
+//        removeNode(service);
+        zkClient.deleteRecursive(Constant.ZK_DATA_PATH);
         createNode(service);
     }
 
@@ -65,11 +68,11 @@ public class ServiceRegistry implements RpcRegistry {
         System.out.println("Create persistent node [ " + persistentPath + "]");
 //        LOGGER.debug("Create persistent node [{}]", path);
 
-        String tempServiceNode = persistentPath + Constant.PATH_SEPERATOR + getServerAddress(service);
+        String tempServiceNode = persistentPath + Constant.PATH_SEPERATOR + getEphemeralInfo(service);
 
         System.out.println("Create ephemeral service node [ " + tempServiceNode + "]");
-        zkClient.createEphemeral(tempServiceNode, String.valueOf(service.getWeight()).getBytes());
-//        LOGGER.debug("Create ephemeral service node [{}]", serviceNode);
+        zkClient.createEphemeral(tempServiceNode, service.getWeight());
+        LOGGER.debug("Create ephemeral service node [{}]", tempServiceNode);
     }
 
     private void removeNode(RpcRegistryService service) {
@@ -84,15 +87,16 @@ public class ServiceRegistry implements RpcRegistry {
     private String getRegistryPath(RpcRegistryService service) {
         String application = service.getApplication();
         String rpcInterface = service.getRpcInterface();
-        String version = service.getVersion();
 
         return Constant.ZK_DATA_PATH + Constant.PATH_SEPERATOR + application + Constant.PATH_SEPERATOR
-                + rpcInterface + Constant.PATH_SEPERATOR + version;
+                + rpcInterface;
     }
 
-    private String getServerAddress(RpcRegistryService service) {
+    private String getEphemeralInfo(RpcRegistryService service) {
         String serverHost = service.getServerHost();
         int serverPort = service.getServerPort();
-        return serverHost + ":" + String.valueOf(serverPort);
+        String version = service.getVersion();
+
+        return version + "&" + serverHost + ":" + String.valueOf(serverPort);
     }
 }

@@ -18,4 +18,11 @@
         <constructor-arg name="registryHost" value="${registry.host}"/>
         <constructor-arg name="registryPort" value="${registry.port}"/>
     </bean>
+
+    <!-- 配置 RPC 发现 -->
+    <bean id="serviceDiscovery" class="com.rabbit.zl.rpc.registry.zookeeper.ServiceDiscovery">
+        <constructor-arg name="registryHost" value="${registry.host}"/>
+        <constructor-arg name="registryPort" value="${registry.port}"/>
+        <constructor-arg name="defaultApplication" value="${application}"/>
+    </bean>
 </beans>

@@ -1,5 +1,6 @@
-package com.rabbit.zl.client.clientStub;
+package com.rabbit.zl.clientStub;
 
+import com.rabbit.zl.rpc.registry.RpcDiscovery;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -21,6 +22,8 @@ public class ClientRpcInvoker extends AbstractRpcInvoker {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClientRpcInvoker.class);
 
     @Getter @Setter private RpcConnector connector;
+
+    @Getter @Setter private RpcDiscovery discovery;
 
     @Override
     public RpcMessage invoke(RpcMessage request) {

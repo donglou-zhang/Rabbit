@@ -1,5 +1,6 @@
 package com.rabbit.zl.rpc.invoke;
 
+import com.rabbit.zl.rpc.registry.RpcDiscovery;
 import com.rabbit.zl.rpc.registry.RpcRegistry;
 import com.rabbit.zl.rpc.transmission.RpcConnector;
 
@@ -17,6 +18,9 @@ public abstract class AbstractRpcInvoker implements RpcInvoker {
 
     @Override
     public void setRegistry(RpcRegistry registry) {}
+
+    @Override
+    public void setDiscovery(RpcDiscovery discovery) {}
 
     @Override
     public void setServiceBeanMap(Map<String, Object> map) {}

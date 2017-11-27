@@ -1,12 +1,15 @@
 package com.rabbit.zl.client;
 
-import com.rabbit.zl.client.clientStub.ClientRpcInvoker;
+import com.rabbit.zl.clientStub.ClientRpcInvoker;
+import com.rabbit.zl.rpc.registry.zookeeper.ServiceDiscovery;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.rabbit.zl.rpc.invoke.RpcInvoker;
 import com.rabbit.zl.rpc.transmission.DefaultRpcConnector;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Rpc Client provides the method to get remote service instance
@@ -34,8 +37,12 @@ public class RpcClient {
 
     @Getter @Setter private DefaultRpcConnector connector;
 
+    @Getter @Setter
+    @Autowired
+    @Qualifier("serviceDiscovery")
+    private ServiceDiscovery serviceDiscovery;
+
     public RpcClient() {
-        //TODO not set the remoteHost and remotePort.
         proxyFactory = new DefaultRpcProxyFactory();
         invoker = new ClientRpcInvoker();
         connector = new DefaultRpcConnector();
@@ -43,6 +50,7 @@ public class RpcClient {
 
     public void init() {
         proxyFactory.setInvoker(invoker);
+        invoker.setDiscovery(serviceDiscovery);
         connector.setRemoteHost(remoteHost);
         connector.setRemotePort(remotePort);
 
