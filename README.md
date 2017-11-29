@@ -28,12 +28,12 @@ Rpc中，动态代理是非常重要的一个内容，下面我将以Jdk动态�
 
 如果我们希望调用服务端的DemoService类的helloWord()方法，则
 
->     getProxy(Class<?> rpcInterface)使用了Jdk的动态代理，调用了Proxy.newProxyInstance(Classloader, Class<?>[] interfaces, InvocationHandler h)方法，
+>     getProxy(Class<?> rpcInterface)使用了Jdk的动态代理，内部调用了Proxy.newProxyInstance方法
 
 
     (2) DemoService service = client.getProxy(DemoService.class);
 
->     这个方法有三个参数
+>     newProxyInstance这个方法有三个参数
 >     @ loader, 定义了一个ClassLoader对象，用于加载生成的代理对象
 >     @ interfaces，给需要代理的对象提供一组接口，可认为该对象实现了这些接口，因此可调用这些接口中的方法
 >     @ h，一个InvocationHandler对象，表示当这个动态代理对象在调用方法时，会关联到哪一个InvocationHandler上
