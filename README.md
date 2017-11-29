@@ -40,7 +40,7 @@ Rpc中，动态代理是非常重要的一个内容，下面我将以Jdk动态�
 
     (3) Proxy.newProxyInstance(Classloader, Class<?>[] interfaces, InvocationHandler h);
 
->     当调用helloWord方法时，实则会根据(2)中关联的InvocationHandler，调用它的invoke()方法
+>     当调用helloWord方法时，实则会根据(3)中关联的InvocationHandler，调用它的invoke()方法
 
     (4) service.helloWorld("Hello, World");
 
