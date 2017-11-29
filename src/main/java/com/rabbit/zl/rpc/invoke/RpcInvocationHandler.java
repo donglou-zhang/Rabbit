@@ -9,6 +9,12 @@ import com.rabbit.zl.rpc.protocol.model.RpcMessage;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+/**
+ * When a method is invoked on a proxy instance, the method invocation is encoded and dispatched to the invoke method of its invocation handler
+ *
+ * @author Vincent
+ * Created  on 2017/11/13.
+ */
 public class RpcInvocationHandler implements InvocationHandler{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcInvocationHandler.class);
@@ -31,6 +37,5 @@ public class RpcInvocationHandler implements InvocationHandler{
         LOGGER.debug("[Rabbit] Rpc client proxy before invocation, | request = {}", response);
 
         return RpcMessage.unpackResponseMessage(response);
-
     }
 }

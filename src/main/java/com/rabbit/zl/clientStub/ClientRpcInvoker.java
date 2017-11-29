@@ -1,5 +1,6 @@
 package com.rabbit.zl.clientStub;
 
+import com.rabbit.zl.common.exception.RpcException;
 import com.rabbit.zl.rpc.registry.RpcDiscovery;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,9 @@ import com.rabbit.zl.rpc.invoke.AbstractRpcInvoker;
 import com.rabbit.zl.rpc.invoke.RpcContext;
 import com.rabbit.zl.rpc.protocol.model.RpcMessage;
 import com.rabbit.zl.rpc.transmission.RpcConnector;
+
+import java.net.InetSocketAddress;
+import java.util.List;
 
 /**
  * RpcInvoker takes charge of using RpcConnector to maintain the channel between client and server
@@ -35,8 +39,21 @@ public class ClientRpcInvoker extends AbstractRpcInvoker {
             request.setRpcAttachments(ctx.getRpcAttachments());
             request.setRpcId(ctx.getRpcId());
             boolean async = ctx.isAsync();
-            LOGGER.debug("[RABBIT] Rpc client invoker is invoking, | request={}, async={}", request, async);
-            return connector.send(request, async);
+
+            //TODO discover the service provider ip address, get the first, don't consider loading balance
+            List<String> services = discovery.discoverAll("Rabbit", request.getRpcInterface().getName());
+            if(services.size() > 0) {
+                String[] parts = services.get(0).split("/");
+                String address = parts[parts.length-2].split("&")[1];
+                String host = address.split(":")[0].trim();
+                int port = Integer.parseInt(address.split(":")[1].trim());
+                request.setServerAddress(new InetSocketAddress(host, port));
+                LOGGER.debug("[RABBIT] Rpc client invoker is invoking, | request={}, async={}", request, async);
+                return connector.send(request, async);
+            }else {
+                throw new RpcException("Can not find the service provider");
+            }
+
         } finally {
             RpcContext.removeRpcContext();
         }

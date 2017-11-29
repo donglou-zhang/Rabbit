@@ -39,10 +39,11 @@ public class ServiceDiscovery implements RpcDiscovery{
 
     @Getter @Setter private int registerPort;
 
-    private String defaultApplication;
+    @Getter @Setter private String defaultApplication;
+
+    public ServiceDiscovery() {}
 
     public ServiceDiscovery(String registryHost, int registryPort, String defaultApplication) {
-            this.zkClient = new ZkClient(registryHost, registryPort);
             this.registerHost = registryHost;
             this.registerPort = registryPort;
             this.defaultApplication = defaultApplication;
@@ -50,6 +51,7 @@ public class ServiceDiscovery implements RpcDiscovery{
     }
 
     private void init() {
+        this.zkClient = new ZkClient(registerHost, registerPort);
 
         LOGGER.info("Connect to zookeeper server: [{}]", (this.registerHost + ":" + this.registerPort));
 
@@ -135,6 +137,7 @@ public class ServiceDiscovery implements RpcDiscovery{
             // For each service path(application/rpcInterface), monitor it's children changes.
             zkClient.subscribeChildChanges(servicePath, zkChildListener);
         }
+        // /path/version&host:port/weight
         return result;
     }
 

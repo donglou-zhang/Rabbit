@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 import com.rabbit.zl.transfer.netty.NettyClientConnector;
 
 /**
+ * Default connector, used in the client side, in charge of sending data to the server
+ * According to configuration, use different kinds of Connector
+ *
  * @author Vincent
  * Created on 2017/11/17.
  */
@@ -22,18 +25,23 @@ public class DefaultRpcConnector{
 
     @Getter @Setter private int remotePort;
 
-    public DefaultRpcConnector() {
-        this.connector = new NettyClientConnector(remoteHost, remotePort);
-    }
+    public DefaultRpcConnector() {}
 
     public DefaultRpcConnector(String host, int port) {
-        //TODO according to configuration, choose the right connector
         this.remoteHost = host;
         this.remotePort = port;
-        connector = new NettyClientConnector(remoteHost, remotePort);
+    }
+
+    private void init() {
+        this.connector = new NettyClientConnector(remoteHost, remotePort);
+        LOGGER.debug("Get the NettyClientConnector with remote address[{}:{}]", remoteHost, remotePort);
     }
 
     public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
+        this.remoteHost = request.getServerAddress().getHostString();
+        this.remotePort = request.getServerAddress().getPort();
+        init();
+
         return connector.send(request, async);
     }
 }

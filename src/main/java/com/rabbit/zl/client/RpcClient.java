@@ -37,22 +37,21 @@ public class RpcClient {
 
     @Getter @Setter private DefaultRpcConnector connector;
 
-    @Getter @Setter
-    @Autowired
-    @Qualifier("serviceDiscovery")
-    private ServiceDiscovery serviceDiscovery;
+    @Getter @Setter private ServiceDiscovery serviceDiscovery;
 
     public RpcClient() {
         proxyFactory = new DefaultRpcProxyFactory();
         invoker = new ClientRpcInvoker();
         connector = new DefaultRpcConnector();
+        serviceDiscovery = new ServiceDiscovery();
     }
 
     public void init() {
+        serviceDiscovery.setRegisterHost("127.0.0.1");
+        serviceDiscovery.setRegisterPort(2181);
+        serviceDiscovery.setDefaultApplication("Rabbit");
         proxyFactory.setInvoker(invoker);
         invoker.setDiscovery(serviceDiscovery);
-        connector.setRemoteHost(remoteHost);
-        connector.setRemotePort(remotePort);
 
         LOGGER.debug("[RABBIT] Rpc client init complete.");
     }
