@@ -46,6 +46,8 @@ public class ServerRpcInvoker extends AbstractRpcInvoker {
      */
     @Override
     public RpcMessage invoke(RpcMessage request) throws RpcException {
+        System.out.println("ServerRpcInvoker: invoke");
+        System.out.println("ServerRpcInvoker: receive request["+request.toString()+"]");
         Class<?> rpcInterface = request.getBody().getRpcInterface();
         RpcMethod method = request.getBody().getRpcMethod();
         String methodName = method.getName();

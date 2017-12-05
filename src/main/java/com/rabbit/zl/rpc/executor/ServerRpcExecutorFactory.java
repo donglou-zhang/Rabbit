@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import com.rabbit.zl.rpc.monitor.MonitoringExecutorService;
 import com.rabbit.zl.rpc.registry.RpcDiscovery;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -18,9 +21,13 @@ import java.util.concurrent.TimeUnit;
  * @author Vincent
  * Created  on 2017/11/21.
  */
+@Component
 public class ServerRpcExecutorFactory implements RpcExecutorFactory {
 
-    @Getter @Setter private RpcDiscovery discovery;
+    @Getter @Setter
+    @Autowired
+    @Qualifier("serviceDiscovery")
+    private RpcDiscovery discovery;
 
     private Map<String, MonitoringExecutorService> monitorMap;
 

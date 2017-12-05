@@ -23,7 +23,10 @@ public class NettyRpcDecoder extends ByteToMessageDecoder{
 
     @Override
     protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf byteBuf, List<Object> list) throws Exception {
-        List<RpcMessage> messages = new DefaultRpcDecoder().decode(byteBuf.array());
+        System.out.println("Decoder: "+byteBuf.readableBytes());
+        byte[] bytes = new byte[byteBuf.readableBytes()];
+        byteBuf.readBytes(bytes);
+        List<RpcMessage> messages = new DefaultRpcDecoder().decode(bytes);
         list.addAll(messages);
     }
 }

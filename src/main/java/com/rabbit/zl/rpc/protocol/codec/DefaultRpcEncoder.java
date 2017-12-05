@@ -35,6 +35,7 @@ public class DefaultRpcEncoder {
 
         //get the specified serialization
         RpcSerialization serializer = serializerRegistry.findSerializerByType(rh.getSt());
+
         if(serializer == null) {
             throw new ProtocolException("Can not find the specific serializer: st = " + rh.getSt());
         }

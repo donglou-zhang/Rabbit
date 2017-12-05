@@ -20,7 +20,13 @@ public class SerializerRegistry {
         return INSTANCE;
     }
 
-    private SerializerRegistry() {}
+    private SerializerRegistry() {
+        init();
+    }
+
+    private void init() {
+        register((byte)1, KryoSerializer.getInstance());
+    }
 
     public RpcSerialization findSerializerByType(byte type) {
         return registry.get(type);

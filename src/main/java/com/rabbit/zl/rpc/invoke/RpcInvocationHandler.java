@@ -33,6 +33,9 @@ public class RpcInvocationHandler implements InvocationHandler{
         RpcMessage request = RpcMessage.newRequestMessage(rpcInterface, methodName, parameterTypes, args);
 
         LOGGER.debug("[Rabbit] Rpc client proxy before invocation, | request = {}", request);
+        if(rpcInvoker == null) {
+            throw new RuntimeException("RpcInvoker is null pointer");
+        }
         RpcMessage response = rpcInvoker.invoke(request);
         LOGGER.debug("[Rabbit] Rpc client proxy before invocation, | request = {}", response);
 

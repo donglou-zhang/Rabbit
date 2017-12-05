@@ -15,7 +15,7 @@ import com.rabbit.zl.transfer.netty.NettyClientConnector;
  * @author Vincent
  * Created on 2017/11/17.
  */
-public class DefaultRpcConnector{
+public class DefaultRpcConnector extends AbstractRpcConnector{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultRpcConnector.class);
 

@@ -7,6 +7,8 @@
     <context:annotation-config/>
     <context:property-placeholder location="classpath:config.properties"/>
 
+    <bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor"/>
+
     <!-- 配置 RPC 服务器 -->
     <bean id="rpcServer" class="com.rabbit.zl.server.RpcServer">
         <constructor-arg name="serverHost" value="${server.host}"/>

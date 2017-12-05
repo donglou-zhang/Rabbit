@@ -2,6 +2,7 @@ package com.rabbit.zl.rpc.registry.zookeeper;
 
 import com.rabbit.zl.common.test.CaseCounter;
 import com.rabbit.zl.factory.ProduceRpcRegistryService;
+import com.rabbit.zl.rpc.registry.example.service.TestHello;
 import com.rabbit.zl.rpc.registry.example.service.TestHelloService;
 import org.I0Itec.zkclient.ZkClient;
 import org.junit.Test;
@@ -43,8 +44,8 @@ public class TestConnectZk {
     @Test
     public void testDiscovery() {
         ServiceDiscovery discovery = new ServiceDiscovery("127.0.0.1", 2181, "Rabbit");
-        System.out.println("TestHello class: " + TestHelloService.class.getName());
-        List<String> rst = discovery.discoverAll(TestHelloService.class.getName());
+        System.out.println("discover: " + TestHello.class.getName());
+        List<String> rst = discovery.discoverAll(TestHello.class.getName());
         for(String str : rst) {
             System.out.println(str);
         }

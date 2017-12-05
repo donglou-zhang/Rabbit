@@ -27,4 +27,9 @@ public class AbstractRpcAcceptor implements RpcAcceptor{
     public void setAddress(String host, int port) {
 
     }
+
+    @Override
+    public void listen() {
+
+    }
 }

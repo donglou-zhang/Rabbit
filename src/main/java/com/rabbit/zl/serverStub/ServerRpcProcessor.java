@@ -1,6 +1,7 @@
 package com.rabbit.zl.serverStub;
 
 import com.rabbit.zl.common.exception.RpcException;
+import com.rabbit.zl.rpc.executor.ServerRpcExecutorFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -31,13 +32,19 @@ public class ServerRpcProcessor implements RpcProcessor{
 
     private RpcMessage response;
 
-    public ServerRpcProcessor() {}
+    public ServerRpcProcessor() {
+        executorFactory = new ServerRpcExecutorFactory();
+        timeoutExecutor = Executors.newFixedThreadPool(3);
+    }
 
     @Override
     public RpcMessage process(RpcMessage request, RpcChannel channel) {
-        MonitoringExecutorService executor = null;
-        //TODO check getRpcInterface().getName() is right or not
-        executor = executorFactory.getMonitorExecutor(request.getApplication() + "/" + request.getRpcInterface().getName());
+        //TODO
+//        MonitoringExecutorService executor = null;
+//        executor = executorFactory.getMonitorExecutor(request.getApplication() + "/" + request.getRpcInterface().getName());
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
         executor.execute(new ProcessTask(request, channel));
         LOGGER.debug("Server processor dispatch thread to handle task");
         return response;
@@ -46,6 +53,7 @@ public class ServerRpcProcessor implements RpcProcessor{
     private RpcMessage handleMessage(RpcMessage request) {
         RpcMessage response = null;
         try {
+            System.out.println("ServerRpcProcessor: handleMessage");
             response = invoker.invoke(request);
         } catch(RpcException e) {
             response = RpcMessage.newResponseMessage(request.getMid(), e);

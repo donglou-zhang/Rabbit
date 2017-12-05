@@ -34,7 +34,7 @@ public class ClientRpcInvoker extends AbstractRpcInvoker {
         try {
             //the context of current thread
             RpcContext ctx = RpcContext.getRpcContext();
-            request.setRpcTimeoutInMillis(checkRpcTimeoutInMillis(ctx));
+            request.setRpcTimeoutInMillis(checkRpcTimeoutInMillis(ctx, request));
             request.setOneWay(ctx.isOneWay());
             request.setRpcAttachments(ctx.getRpcAttachments());
             request.setRpcId(ctx.getRpcId());
@@ -42,6 +42,7 @@ public class ClientRpcInvoker extends AbstractRpcInvoker {
 
             //TODO discover the service provider ip address, get the first, don't consider loading balance
             List<String> services = discovery.discoverAll("Rabbit", request.getRpcInterface().getName());
+
             if(services.size() > 0) {
                 String[] parts = services.get(0).split("/");
                 String address = parts[parts.length-2].split("&")[1];
@@ -65,14 +66,14 @@ public class ClientRpcInvoker extends AbstractRpcInvoker {
      * @param ctx
      * @return
      */
-    private int checkRpcTimeoutInMillis(RpcContext ctx) {
+    private int checkRpcTimeoutInMillis(RpcContext ctx, RpcMessage request) {
         //Get timeout from rpcContext in this invocation
         int timeout = ctx.getRpcTimeoutInMillis();
         if(timeout > 0)
             return timeout;
 
         //if does not set timeout in this invocation, get from global setting
-        timeout = connector.getRpcTimeoutInMillis();
+        timeout = request.getRpcTimeoutInMillis();
         if(timeout > 0)
             return timeout;
 

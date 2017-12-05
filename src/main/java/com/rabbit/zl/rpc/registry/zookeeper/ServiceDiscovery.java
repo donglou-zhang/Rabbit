@@ -41,7 +41,9 @@ public class ServiceDiscovery implements RpcDiscovery{
 
     @Getter @Setter private String defaultApplication;
 
-    public ServiceDiscovery() {}
+    public ServiceDiscovery() {
+
+    }
 
     public ServiceDiscovery(String registryHost, int registryPort, String defaultApplication) {
             this.registerHost = registryHost;
@@ -52,6 +54,8 @@ public class ServiceDiscovery implements RpcDiscovery{
 
     private void init() {
         this.zkClient = new ZkClient(registerHost, registerPort);
+
+        System.out.println("ServiceDiscovery: connect to zookeeper [" + registerHost + ":" + registerPort + "]");
 
         LOGGER.info("Connect to zookeeper server: [{}]", (this.registerHost + ":" + this.registerPort));
 

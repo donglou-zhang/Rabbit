@@ -2,6 +2,7 @@ package com.rabbit.zl.client;
 
 import com.rabbit.zl.clientStub.ClientRpcInvoker;
 import com.rabbit.zl.rpc.registry.zookeeper.ServiceDiscovery;
+import com.rabbit.zl.rpc.transmission.RpcConnector;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -35,23 +36,23 @@ public class RpcClient {
 
     @Getter @Setter private RpcInvoker invoker;
 
-    @Getter @Setter private DefaultRpcConnector connector;
+    @Getter @Setter private RpcConnector connector;
 
-    @Getter @Setter private ServiceDiscovery serviceDiscovery;
+    @Getter @Setter
+    private ServiceDiscovery serviceDiscovery;
 
     public RpcClient() {
         proxyFactory = new DefaultRpcProxyFactory();
         invoker = new ClientRpcInvoker();
         connector = new DefaultRpcConnector();
-        serviceDiscovery = new ServiceDiscovery();
+        serviceDiscovery = new ServiceDiscovery("127.0.0.1", 2181, "Rabbit");
+        init();
     }
 
     public void init() {
-        serviceDiscovery.setRegisterHost("127.0.0.1");
-        serviceDiscovery.setRegisterPort(2181);
-        serviceDiscovery.setDefaultApplication("Rabbit");
         proxyFactory.setInvoker(invoker);
         invoker.setDiscovery(serviceDiscovery);
+        invoker.setConnector(connector);
 
         LOGGER.debug("[RABBIT] Rpc client init complete.");
     }

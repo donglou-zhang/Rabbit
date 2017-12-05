@@ -35,4 +35,6 @@ public interface RpcAcceptor {
      * @param port
      */
     void setAddress(String host, int port);
+
+    void listen();
 }

@@ -54,7 +54,9 @@ public class NettyClientConnector extends AbstractRpcConnector {
                     });
 
             ChannelFuture future = bs.connect(this.remoteHost, this.remotePort).sync();
+            System.out.println("NettyClientConnector: connect["+this.remoteHost+":"+this.remotePort+"]");
             future.channel().writeAndFlush(request).sync();
+            System.out.println("NettyClientConnector: send request["+request.toString()+"]");
 
             // Use lock to wait for the response
             synchronized (lock) {
@@ -87,6 +89,7 @@ public class NettyClientConnector extends AbstractRpcConnector {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            System.out.println("NettyClientConnector: channelRead");
             this.response = (RpcMessage) msg;
 
             // Get the response, and it should notify the waiting thread

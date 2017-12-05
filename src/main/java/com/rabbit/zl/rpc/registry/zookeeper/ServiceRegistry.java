@@ -44,8 +44,10 @@ public class ServiceRegistry implements RpcRegistry {
         if(service == null) {
             throw new RpcException("Registry service is null, please check!");
         }
+        //TODO for test
 //        removeNode(service);
         zkClient.deleteRecursive(Constant.ZK_DATA_PATH);
+
         createNode(service);
     }
 
@@ -65,12 +67,9 @@ public class ServiceRegistry implements RpcRegistry {
             zkClient.createPersistent(persistentPath, true);
         }
 
-        System.out.println("Create persistent node [ " + persistentPath + "]");
 //        LOGGER.debug("Create persistent node [{}]", path);
 
         String tempServiceNode = persistentPath + Constant.PATH_SEPERATOR + getEphemeralInfo(service);
-
-        System.out.println("Create ephemeral service node [ " + tempServiceNode + "]");
         zkClient.createEphemeral(tempServiceNode, service.getWeight());
         LOGGER.debug("Create ephemeral service node [{}]", tempServiceNode);
     }

@@ -1,6 +1,7 @@
 package com.rabbit.zl.server;
 
 import com.rabbit.zl.rpc.registry.RpcRegistryService;
+import com.rabbit.zl.rpc.transmission.DefaultRpcAcceptor;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -48,7 +49,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
 
     @Getter @Setter private RpcProcessor processor;
 
-    @Getter @Setter private RpcAcceptor acceptor;
+    @Getter @Setter private DefaultRpcAcceptor acceptor;
 
     @Getter @Setter private RpcInvoker invoker;
 
@@ -65,13 +66,17 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
 
         processor = new ServerRpcProcessor();
         invoker = new ServerRpcInvoker();
-        acceptor = new NettyServerAcceptor();
+        acceptor = new DefaultRpcAcceptor(serverHost, serverPort);
+
+        init();
     }
 
     public void init() {
         invoker.setRegistry(registry);
         invoker.setServiceBeanMap(serviceBeanMap);
+        processor.setInvoker(invoker);
         acceptor.setAddress(serverHost, serverPort);
+        acceptor.setProcessor(processor);
     }
 
     @Override
@@ -87,9 +92,14 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
             service.setVersion(array[1]);
             service.setWeight(Integer.parseInt(array[2]));
             registry.register(service);
-            System.out.println("To register service: " + key);
         }
-        System.out.println("afterPropertiesSet: register finished!");
+        System.out.println("register service finish");
+
+        new Thread() {
+            public void run() {
+                acceptor.listen();
+            }
+        }.start();
     }
 
     @Override
