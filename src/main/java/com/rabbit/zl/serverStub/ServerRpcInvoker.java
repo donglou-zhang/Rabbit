@@ -46,15 +46,13 @@ public class ServerRpcInvoker extends AbstractRpcInvoker {
      */
     @Override
     public RpcMessage invoke(RpcMessage request) throws RpcException {
-        System.out.println("ServerRpcInvoker: invoke");
-        System.out.println("ServerRpcInvoker: receive request["+request.toString()+"]");
         Class<?> rpcInterface = request.getBody().getRpcInterface();
         RpcMethod method = request.getBody().getRpcMethod();
         String methodName = method.getName();
         Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] params = method.getParameters();
 
-        Object serviceBean = serviceBeanMap.get(rpcInterface);
+        Object serviceBean = serviceBeanMap.get(rpcInterface.getName());
         if(serviceBean == null) {
             throw new RpcException("Can not find the corresponding service bean.");
         }
@@ -72,7 +70,9 @@ public class ServerRpcInvoker extends AbstractRpcInvoker {
             int methodIndex = methodAccess.getIndex(methodName, parameterTypes);
             Object returnObject = methodAccess.invoke(serviceBean, methodIndex, params);
 
-            return RpcMessage.newResponseMessage(request.getMid(), returnObject);
+            RpcMessage response = RpcMessage.newResponseMessage(request.getMid(), returnObject);
+            System.out.println("ServerRpcInvoker: After invoking, response message[" + response.toString() + "]");
+            return response;
         } catch(Exception e) {
             LOGGER.warn("[Rabbit] Rpc server invoker error", e);
             if(isDeclaredException(e, rpcInterface, methodName, parameterTypes)) {

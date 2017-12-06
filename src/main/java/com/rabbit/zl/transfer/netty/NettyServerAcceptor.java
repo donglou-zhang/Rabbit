@@ -39,7 +39,6 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
     }
 
     public void setProcessor(RpcProcessor processor) {
-        System.out.println("Netty: set processor");
         this.processor = processor;
     }
 
@@ -67,16 +66,14 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
             }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
 
             ChannelFuture future = bootstrap.bind(serverHost, serverPort).sync();
+            System.out.println("NettyServerAcceptor: start listening address["+serverHost+" : "+serverPort+"] ...");
 
-            System.out.println("NettyServerAcceptor: start listen["+serverHost+":"+serverPort+"]...");
-//            LOGGER.debug("Server started on address [{} : {}]", serverHost, serverPort);
+            LOGGER.debug("Server started on address [{} : {}]", serverHost, serverPort);
 
             future.channel().closeFuture().sync();
-            System.out.println("NettyServerAcceptor: close future");
         } catch (Exception e) {
             LOGGER.error("Server start error!");
         } finally {
-            System.out.println("NettyServerAcceptor: finally");
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
@@ -91,16 +88,20 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
     class ServerResultHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            System.out.println("Acceptor: channelRead RpcMessage");
-            if(processor == null) {
-                System.out.println("processor is null");
+            if(msg!=null) {
+                try{
+                    System.out.println("NettyServerAcceptor: Before processing, request message[" + msg.toString() + "]");
+                    RpcMessage response = processor.process((RpcMessage) msg, new DefaultRpcChannel());
+                    System.out.println("NettyServerAcceptor: After processing, response message[" + response.toString() + "]");
+                    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+                }catch(Exception e) {
+                    e.printStackTrace();
+                }
             }
-            processor.process((RpcMessage) msg, new DefaultRpcChannel());
         }
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-            System.out.println("Acceptor: exceptionCaught["+cause+"]");
             cause.printStackTrace();
             LOGGER.error("Server result handler error");
             ctx.close();

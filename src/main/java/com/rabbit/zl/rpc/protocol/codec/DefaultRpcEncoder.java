@@ -8,6 +8,10 @@ import com.rabbit.zl.common.util.ByteUtil;
 import com.rabbit.zl.rpc.protocol.model.RpcBody;
 import com.rabbit.zl.rpc.protocol.model.RpcHeader;
 import com.rabbit.zl.rpc.protocol.model.RpcMessage;
+import com.rabbit.zl.rpc.protocol.model.RpcOption;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default rpc encoder, encodes a {@code RpcMessage} object into bytes

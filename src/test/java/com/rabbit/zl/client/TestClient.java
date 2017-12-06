@@ -15,7 +15,7 @@ public class TestClient {
     public void testGetBean() {
         RpcClient client = ProduceRpcClient.getRpcClient();
         TestHello service = client.getBean(TestHello.class);
-        System.out.println(service.Hello("Vincent"));
-        System.out.println(String.format("[Rabbit] (^_^) <%s> Test Case Success -> Client getBean. ", CaseCounter.incr(2)));
+        System.out.println("In testGetBean(), the result is: " + service.Hello("Vincent"));
+        System.out.println(String.format("[Rabbit] (^_^) <%s> Test Case Success -> Client getBean. ", CaseCounter.incr(1)));
     }
 }

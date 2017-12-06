@@ -38,7 +38,7 @@ public class RpcInvocationHandler implements InvocationHandler{
         }
         RpcMessage response = rpcInvoker.invoke(request);
         LOGGER.debug("[Rabbit] Rpc client proxy before invocation, | request = {}", response);
-
+        
         return RpcMessage.unpackResponseMessage(response);
     }
 }

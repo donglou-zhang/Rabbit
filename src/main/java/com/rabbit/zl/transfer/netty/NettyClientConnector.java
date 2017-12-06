@@ -54,9 +54,8 @@ public class NettyClientConnector extends AbstractRpcConnector {
                     });
 
             ChannelFuture future = bs.connect(this.remoteHost, this.remotePort).sync();
-            System.out.println("NettyClientConnector: connect["+this.remoteHost+":"+this.remotePort+"]");
+            System.out.println("NettyClientConnector: connect[" + this.remoteHost + ":" + this.remotePort + "], and send the request[" + request.toString() + "]");
             future.channel().writeAndFlush(request).sync();
-            System.out.println("NettyClientConnector: send request["+request.toString()+"]");
 
             // Use lock to wait for the response
             synchronized (lock) {
@@ -89,17 +88,24 @@ public class NettyClientConnector extends AbstractRpcConnector {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            System.out.println("NettyClientConnector: channelRead");
             this.response = (RpcMessage) msg;
 
+            System.out.println("NettyClientConnector: response: "+response);
             // Get the response, and it should notify the waiting thread
             synchronized (lock) {
                 lock.notifyAll();
             }
         }
 
+        //After connect successful, send request to server
+//        @Override
+//        public void channelActive(ChannelHandlerContext ctx) {
+//            ctx.writeAndFlush(request);
+//        }
+
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            System.out.println("Client exception is general");
             LOGGER.error("Client exception is general");
         }
     }

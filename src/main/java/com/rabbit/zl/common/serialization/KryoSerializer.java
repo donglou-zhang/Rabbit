@@ -7,6 +7,7 @@ import com.esotericsoftware.kryo.serializers.CompatibleFieldSerializer;
 import com.rabbit.zl.common.util.Assert;
 import com.rabbit.zl.common.exception.ProtocolException;
 import com.rabbit.zl.rpc.protocol.model.RpcBody;
+import com.rabbit.zl.rpc.protocol.model.RpcMethod;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,7 +19,7 @@ import java.lang.ref.SoftReference;
  * @author Vincent
  * Created  on 2017/11/12.
  */
-public class KryoSerializer implements RpcSerialization {
+public class KryoSerializer implements RpcSerialization<RpcBody> {
 
     private static final KryoSerializer INSTANCE = new KryoSerializer();
 
@@ -47,8 +48,8 @@ public class KryoSerializer implements RpcSerialization {
 
     private static Kryo newKryo() {
         Kryo kryo = new Kryo();
-//        kryo.register(RpcHeader.class);
         kryo.register(RpcBody.class);
+        kryo.register(RpcMethod.class);
         kryo.setDefaultSerializer(CompatibleFieldSerializer.class);
         return kryo;
     }
@@ -76,21 +77,24 @@ public class KryoSerializer implements RpcSerialization {
     }
 
     @Override
-    public byte[] serialize(Object obj) throws ProtocolException {
+    public byte[] serialize(RpcBody obj) throws ProtocolException {
         Assert.notNull(obj);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Output output = new Output(baos);
         kryo().writeObject(output, obj);
+        //Don't forget to flush and close, otherwise it won't work
+        output.flush();
+        output.close();
         return baos.toByteArray();
     }
 
     @Override
-    public Object deserialize(byte[] data) throws ProtocolException {
+    public RpcBody deserialize(byte[] data) throws ProtocolException {
         return deserialize(data, 0);
     }
 
     @Override
-    public Object deserialize(byte[] data, int off) throws ProtocolException {
+    public RpcBody deserialize(byte[] data, int off) throws ProtocolException {
         Assert.notNull(data);
         ByteArrayInputStream bais = new ByteArrayInputStream(data, off, data.length - off);
         Input input = new Input(bais);

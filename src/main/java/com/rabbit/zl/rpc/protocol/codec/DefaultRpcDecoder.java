@@ -39,7 +39,7 @@ public class DefaultRpcDecoder extends AbstractProtocolDecoder{
     public DefaultRpcDecoder() {}
 
     public List<RpcMessage> decode(byte[] bytes) throws ProtocolException {
-        List<RpcMessage> messages = new ArrayList<RpcMessage>();
+        List<RpcMessage> messages = new ArrayList<>();
         adaptBuffer();
         buff.append(bytes);
 
@@ -202,11 +202,11 @@ public class DefaultRpcDecoder extends AbstractProtocolDecoder{
             return;
         }
 
-        RpcSerialization deserializer = serializerRegistry.findSerializerByType(rpcMessage.getHeader().getSt());
+        RpcSerialization<RpcBody> deserializer = serializerRegistry.findSerializerByType(rpcMessage.getHeader().getSt());
         if(deserializer == null) {
             throw new ProtocolException("Can not find the specific deserializer");
         }
-        RpcBody rpcBody = (RpcBody) deserializer.deserialize(buff.buffer(), 20 + splitIndex);
+        RpcBody rpcBody = deserializer.deserialize(buff.buffer(), 20 + splitIndex);
         rpcMessage.setBody(rpcBody);
         searchIndex = headerSize + bodySize + splitIndex;
         state = END;

@@ -23,7 +23,9 @@ import com.rabbit.zl.serverStub.ServerRpcInvoker;
 import com.rabbit.zl.serverStub.ServerRpcProcessor;
 import com.rabbit.zl.transfer.netty.NettyServerAcceptor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -38,7 +40,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcServer.class);
 
     // Store the mapping between rpcInterface and it's implementation bean
-    private Map<String, Object> serviceBeanMap = new HashMap<>();
+    private Map<String, Object> serviceBeanMap;
+
+    private List<String> rpcServiceList;
 
     @Value("${application}")
     private String application;
@@ -64,6 +68,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
         this.serverHost = serverHost;
         this.serverPort = serverPort;
 
+        serviceBeanMap = new HashMap<>();
+        rpcServiceList = new ArrayList<>();
+
         processor = new ServerRpcProcessor();
         invoker = new ServerRpcInvoker();
         acceptor = new DefaultRpcAcceptor(serverHost, serverPort);
@@ -82,7 +89,8 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
     @Override
     public void afterPropertiesSet() throws Exception {
         // Complete all the rpc interface registry
-        for(String key : serviceBeanMap.keySet()) {
+        int serviceRegisterCount = 0;
+        for(String key : rpcServiceList) {
             RpcRegistryService service = new RpcRegistryService();
             service.setApplication(application);
             service.setServerHost(serverHost);
@@ -92,8 +100,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
             service.setVersion(array[1]);
             service.setWeight(Integer.parseInt(array[2]));
             registry.register(service);
+            serviceRegisterCount++;
         }
-        System.out.println("register service finish");
+        System.out.println("register service finish, has registered " + serviceRegisterCount + " services.");
 
         new Thread() {
             public void run() {
@@ -111,9 +120,9 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
                 String rpcInterface = serviceBean.getClass().getAnnotation(RpcService.class).value().getName();
                 String version = serviceBean.getClass().getAnnotation(RpcService.class).version();
                 int weight = serviceBean.getClass().getAnnotation(RpcService.class).weight();
-                serviceBeanMap.put(rpcInterface+"&"+version+"&"+String.valueOf(weight), serviceBean);
+                serviceBeanMap.put(rpcInterface, serviceBean);
+                rpcServiceList.add(rpcInterface+"&"+version+"&"+String.valueOf(weight));
             }
         }
-        System.out.println("setApplicationContext finished!");
     }
 }

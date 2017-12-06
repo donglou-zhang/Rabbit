@@ -21,7 +21,6 @@ public class NettyRpcEncoder extends MessageToByteEncoder<Object>{
     protected void encode(ChannelHandlerContext channelHandlerContext, Object in, ByteBuf byteBuf) throws Exception {
         if(genericClass.isInstance(in)) {
             byte[] data = new DefaultRpcEncoder().encode((RpcMessage) in);
-            System.out.println("Encoder: "+data.length);
             byteBuf.writeBytes(data);
         }
     }

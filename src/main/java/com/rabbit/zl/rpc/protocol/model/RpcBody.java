@@ -22,7 +22,7 @@ import java.util.Map;
 @EqualsAndHashCode(of = {"rpcInterface", "rpcMethod", "rpcReturn", "rpcException", "rpcAttachments"})
 public class RpcBody implements Serializable{
 
-    private static final long serialVersionUID = 5138100956693144357L;
+    private static final long serialVersionUID = -2481171914209936374L;
 
     @Getter @Setter private String rpcId;
 

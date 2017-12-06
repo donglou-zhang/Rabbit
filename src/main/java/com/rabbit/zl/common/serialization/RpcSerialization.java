@@ -1,6 +1,7 @@
 package com.rabbit.zl.common.serialization;
 
 import com.rabbit.zl.common.exception.ProtocolException;
+import com.rabbit.zl.rpc.protocol.model.RpcBody;
 
 /**
  * Serialize object to bytes or deserialize object from bytes
@@ -8,7 +9,7 @@ import com.rabbit.zl.common.exception.ProtocolException;
  * @author Vincent
  * Created on 2017/11/12.
  */
-public interface RpcSerialization {
+public interface RpcSerialization<T> {
 
     /**
      *
@@ -23,7 +24,7 @@ public interface RpcSerialization {
      * @return
      * @throws ProtocolException
      */
-    byte[] serialize(Object obj) throws ProtocolException;
+    byte[] serialize(RpcBody obj) throws ProtocolException;
 
     /**
      * Deserialize object from bytes
@@ -32,7 +33,7 @@ public interface RpcSerialization {
      * @return
      * @throws ProtocolException
      */
-    Object deserialize(byte[] data) throws ProtocolException;
+    T deserialize(byte[] data) throws ProtocolException;
 
     /**
      * Deserialize object from bytes at specific offset
@@ -42,5 +43,5 @@ public interface RpcSerialization {
      * @return
      * @throws ProtocolException
      */
-    Object deserialize(byte[] data, int off) throws ProtocolException;
+    T deserialize(byte[] data, int off) throws ProtocolException;
 }

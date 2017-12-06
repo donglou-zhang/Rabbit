@@ -47,13 +47,18 @@ public class ServerRpcProcessor implements RpcProcessor{
 
         executor.execute(new ProcessTask(request, channel));
         LOGGER.debug("Server processor dispatch thread to handle task");
+        try {
+            Thread.sleep(2000);
+            System.out.println("ServerRpcProcessor: Wait 2000ms, after process get the response: "+response);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return response;
     }
 
     private RpcMessage handleMessage(RpcMessage request) {
         RpcMessage response = null;
         try {
-            System.out.println("ServerRpcProcessor: handleMessage");
             response = invoker.invoke(request);
         } catch(RpcException e) {
             response = RpcMessage.newResponseMessage(request.getMid(), e);
