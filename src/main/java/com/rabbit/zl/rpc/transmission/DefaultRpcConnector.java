@@ -34,13 +34,14 @@ public class DefaultRpcConnector extends AbstractRpcConnector{
 
     private void init() {
         this.connector = new NettyClientConnector(remoteHost, remotePort);
+        System.out.println("DefaultRpcConnector: init connector");
         LOGGER.debug("Get the NettyClientConnector with remote address[{}:{}]", remoteHost, remotePort);
     }
 
     public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
-        this.remoteHost = request.getServerAddress().getHostString();
-        this.remotePort = request.getServerAddress().getPort();
-        init();
+        if(connector == null) {
+            init();
+        }
 
         return connector.send(request, async);
     }

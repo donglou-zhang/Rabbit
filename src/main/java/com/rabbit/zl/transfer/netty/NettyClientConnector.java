@@ -6,6 +6,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.rabbit.zl.rpc.protocol.codec.NettyRpcDecoder;
@@ -30,20 +31,21 @@ public class NettyClientConnector extends AbstractRpcConnector {
 
     private ChannelFuture future;
     private Bootstrap bootstrap;
+    private ResultHandler resultHandler;
 
     public NettyClientConnector() {}
 
     public NettyClientConnector(String host, int port) {
         this.remoteHost = host;
         this.remotePort = port;
-        bootstrap = new Bootstrap();
+
+        init();
     }
 
-    public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
+    private void init() {
         EventLoopGroup group = new NioEventLoopGroup();
-//        final ResultHandler resultHandler = new ResultHandler();
-        final ResultHandler resultHandler = new ResultHandler(request);
-        RpcMessage response = null;
+        bootstrap = new Bootstrap();
+        resultHandler = new ResultHandler();
         try {
             bootstrap.group(group).channel(NioSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
@@ -53,28 +55,41 @@ public class NettyClientConnector extends AbstractRpcConnector {
                             ChannelPipeline cp = socketChannel.pipeline();
                             cp.addLast("RpcMessageEncoder", new NettyRpcEncoder(RpcMessage.class));
                             cp.addLast("RpcMessageDecoder", new NettyRpcDecoder(RpcMessage.class));
+                            cp.addLast("TimeoutHandler", new ReadTimeoutHandler(3));
                             cp.addLast("ResultHandler", resultHandler);
                         }
                     });
             connect();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+//        finally {
+//            group.shutdownGracefully();
+//        }
+    }
 
-            // Use lock to wait for the response
-            synchronized (lock) {
-                lock.wait();
+    public RpcMessage send(RpcMessage request, boolean async) throws RpcException{
+            RpcMessage response = null;
+
+            if(this.future == null || !this.future.channel().isActive()) {
+                connect();
+                System.out.println("NettyClientConnector: in send(), reconnect");
             }
 
-            // After get the response, free all the source
-            response = resultHandler.getResponse();
-//            if(response != null) {
-//                future.channel().closeFuture().sync();
-//            }
+            try {
+                future.channel().writeAndFlush(request).sync();
 
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } finally {
-            group.shutdownGracefully();
-        }
-        return response;
+                // Use lock to wait for the response
+                synchronized (lock) {
+                    lock.wait();
+                }
+                // After get the response, free all the source
+                response = resultHandler.getResponse();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return response;
     }
 
     public long connect() {
@@ -120,11 +135,11 @@ public class NettyClientConnector extends AbstractRpcConnector {
         /**
          *  After connect successful, send request to server
          */
-        @Override
-        public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
-            ctx.writeAndFlush(this.request);
-            System.out.println("NettyClientConnector: send the request[" + request.toString() + "]");
-        }
+//        @Override
+//        public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
+//            ctx.writeAndFlush(this.request);
+//            System.out.println("NettyClientConnector: send the request[" + request.toString() + "]");
+//        }
 
         public void channelReadCompelete(ChannelHandlerContext ctx) {
             ctx.flush();

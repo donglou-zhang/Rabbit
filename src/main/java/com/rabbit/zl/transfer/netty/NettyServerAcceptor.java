@@ -5,6 +5,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -62,6 +63,7 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
                 public void initChannel(SocketChannel channel) throws Exception {
                     channel.pipeline().addLast("RpcMessageEncoder", new NettyRpcEncoder(RpcMessage.class))
                             .addLast("RpcMessageDecoder", new NettyRpcDecoder(RpcMessage.class))
+                            .addLast("TimeoutHandler", new ReadTimeoutHandler(3))
                             .addLast("resultHandler", resultHandler);
                 }
             }).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
@@ -88,7 +90,6 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
     class ServerResultHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            System.out.println("NettyServerAcceptor: Before processing, request message[" + msg.toString() + "]");
             RpcMessage response = processor.process((RpcMessage) msg, new DefaultRpcChannel());
             //In server side, ChannelFutureListener.CLOSE will close connection with client initiative
 //            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);

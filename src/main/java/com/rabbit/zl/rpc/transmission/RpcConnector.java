@@ -28,4 +28,12 @@ public interface RpcConnector {
      * @return global setting rpc timeout in millis
      */
     int getRpcTimeoutInMillis();
+
+    String getRemoteHost();
+
+    void setRemoteHost(String remoteHost);
+
+    int getRemotePort();
+
+    void setRemotePort(int remotePort);
 }

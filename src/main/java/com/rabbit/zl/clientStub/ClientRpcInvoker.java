@@ -50,6 +50,8 @@ public class ClientRpcInvoker extends AbstractRpcInvoker {
                 int port = Integer.parseInt(address.split(":")[1].trim());
                 request.setServerAddress(new InetSocketAddress(host, port));
                 LOGGER.debug("[RABBIT] Rpc client invoker is invoking, | request={}, async={}", request, async);
+                connector.setRemoteHost(host);
+                connector.setRemotePort(port);
                 return connector.send(request, async);
             }else {
                 throw new RpcException("Can not find the service provider");

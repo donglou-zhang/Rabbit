@@ -3,6 +3,7 @@ package com.rabbit.zl.rpc.transmission;
 import com.rabbit.zl.common.exception.RpcException;
 import com.rabbit.zl.rpc.protocol.model.RpcMessage;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Vincent
@@ -10,9 +11,9 @@ import lombok.Getter;
  */
 public abstract class AbstractRpcConnector implements RpcConnector{
 
-    @Getter private String remoteHost;
+    @Getter @Setter public String remoteHost;
 
-    @Getter private int remotePort;
+    @Getter @Setter public int remotePort;
 
     public AbstractRpcConnector() {}
 
@@ -34,7 +35,7 @@ public abstract class AbstractRpcConnector implements RpcConnector{
         return false;
     }
 
-    public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
+    public RpcMessage send(RpcMessage request, boolean async) throws RpcException{
         return null;
     }
 

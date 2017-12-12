@@ -2,6 +2,7 @@ package com.rabbit.zl.client;
 
 import com.rabbit.zl.clientStub.ClientRpcInvoker;
 import com.rabbit.zl.rpc.registry.zookeeper.ServiceDiscovery;
+import com.rabbit.zl.rpc.transmission.DefaultRpcAcceptor;
 import com.rabbit.zl.rpc.transmission.RpcConnector;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,7 +37,7 @@ public class RpcClient {
 
     @Getter @Setter private RpcInvoker invoker;
 
-    @Getter @Setter private RpcConnector connector;
+    @Getter @Setter private DefaultRpcConnector connector;
 
     @Getter @Setter
     private ServiceDiscovery serviceDiscovery;
