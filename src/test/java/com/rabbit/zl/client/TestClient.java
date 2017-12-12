@@ -3,6 +3,7 @@ package com.rabbit.zl.client;
 import com.rabbit.zl.common.test.CaseCounter;
 import com.rabbit.zl.factory.ProduceRpcClient;
 import com.rabbit.zl.rpc.registry.example.service.TestHello;
+import com.rabbit.zl.rpc.registry.example.service.TestOperator;
 import org.junit.Test;
 
 /**
@@ -15,7 +16,15 @@ public class TestClient {
     public void testGetBean() {
         RpcClient client = ProduceRpcClient.getRpcClient();
         TestHello service = client.getBean(TestHello.class);
-        System.out.println("In testGetBean(), the result is: " + service.Hello("Vincent"));
-        System.out.println(String.format("[Rabbit] (^_^) <%s> Test Case Success -> Client getBean. ", CaseCounter.incr(1)));
+        System.out.println("In testGetBean(), the result of hello() is: " + service.hello("Vincent"));
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("In testGetBean(), the result of time() is: " + service.time());
+//        TestOperator service2 = client.getBean(TestOperator.class);
+//        System.out.println("In testGetBean(), the result is: " + service2.add(10,25));
+//        System.out.println(String.format("[Rabbit] (^_^) <%s> Test Case Success -> Client getBean. ", CaseCounter.incr(2)));
     }
 }

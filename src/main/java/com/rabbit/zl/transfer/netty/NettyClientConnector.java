@@ -28,20 +28,24 @@ public class NettyClientConnector extends AbstractRpcConnector {
 
     private int remotePort;
 
+    private ChannelFuture future;
+    private Bootstrap bootstrap;
+
     public NettyClientConnector() {}
 
     public NettyClientConnector(String host, int port) {
         this.remoteHost = host;
         this.remotePort = port;
+        bootstrap = new Bootstrap();
     }
 
     public RpcMessage send(RpcMessage request, boolean async) throws RpcException {
         EventLoopGroup group = new NioEventLoopGroup();
-        final ResultHandler resultHandler = new ResultHandler();
+//        final ResultHandler resultHandler = new ResultHandler();
+        final ResultHandler resultHandler = new ResultHandler(request);
         RpcMessage response = null;
         try {
-            Bootstrap bs = new Bootstrap();
-            bs.group(group).channel(NioSocketChannel.class)
+            bootstrap.group(group).channel(NioSocketChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
@@ -52,10 +56,7 @@ public class NettyClientConnector extends AbstractRpcConnector {
                             cp.addLast("ResultHandler", resultHandler);
                         }
                     });
-
-            ChannelFuture future = bs.connect(this.remoteHost, this.remotePort).sync();
-            System.out.println("NettyClientConnector: connect[" + this.remoteHost + ":" + this.remotePort + "], and send the request[" + request.toString() + "]");
-            future.channel().writeAndFlush(request).sync();
+            connect();
 
             // Use lock to wait for the response
             synchronized (lock) {
@@ -64,9 +65,9 @@ public class NettyClientConnector extends AbstractRpcConnector {
 
             // After get the response, free all the source
             response = resultHandler.getResponse();
-            if(response != null) {
-                future.channel().closeFuture().sync();
-            }
+//            if(response != null) {
+//                future.channel().closeFuture().sync();
+//            }
 
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -76,11 +77,30 @@ public class NettyClientConnector extends AbstractRpcConnector {
         return response;
     }
 
+    public long connect() {
+        try {
+            if(this.future == null || !this.future.channel().isActive()) {
+                this.future = bootstrap.connect(this.remoteHost, this.remotePort).sync();
+                System.out.println("NettyClientConnector: connect[" + this.remoteHost + ":" + this.remotePort + "]");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
     /**
      * Handle the response message. When get the response, notify the waiting thread to continue.
      */
     class ResultHandler extends ChannelInboundHandlerAdapter {
+        private RpcMessage request;
         private RpcMessage response;
+
+        public ResultHandler() {}
+
+        public ResultHandler(RpcMessage request) {
+            this.request = request;
+        }
 
         public RpcMessage getResponse() {
             return response;
@@ -97,11 +117,18 @@ public class NettyClientConnector extends AbstractRpcConnector {
             }
         }
 
-        //After connect successful, send request to server
-//        @Override
-//        public void channelActive(ChannelHandlerContext ctx) {
-//            ctx.writeAndFlush(request);
-//        }
+        /**
+         *  After connect successful, send request to server
+         */
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
+            ctx.writeAndFlush(this.request);
+            System.out.println("NettyClientConnector: send the request[" + request.toString() + "]");
+        }
+
+        public void channelReadCompelete(ChannelHandlerContext ctx) {
+            ctx.flush();
+        }
 
         @Override
         public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {

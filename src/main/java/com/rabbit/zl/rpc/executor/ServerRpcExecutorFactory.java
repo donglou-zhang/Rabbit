@@ -24,11 +24,6 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class ServerRpcExecutorFactory implements RpcExecutorFactory {
 
-    @Getter @Setter
-    @Autowired
-    @Qualifier("serviceDiscovery")
-    private RpcDiscovery discovery;
-
     private Map<String, MonitoringExecutorService> monitorMap;
 
     public ServerRpcExecutorFactory() {
@@ -41,19 +36,12 @@ public class ServerRpcExecutorFactory implements RpcExecutorFactory {
     }
 
     private MonitoringExecutorService getExecutor(String service) {
-        String application = service.split("/")[0];
-        String rpcInterface = service.split("/")[1];
         MonitoringExecutorService mes = monitorMap.get(service);
         if(mes == null) {
             synchronized (this) {
                 if(mes == null) {
-                    List<String> serviceList = discovery.discoverAll(application, rpcInterface);
-                    if(serviceList.size() == 0) {
-                        throw new RpcException(RpcException.SERVER_ERROR, "No registered rpc service!");
-                    }
-
                     //TODO Configurations like poolSize can be set by other ways
-                    RpcThreadPoolExecutor executor = new RpcThreadPoolExecutor(1,1,60, TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>(10), new CustomizedThreadFactory("Rabbit"));
+                    RpcThreadPoolExecutor executor = new RpcThreadPoolExecutor(1,10,60, TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>(10), new CustomizedThreadFactory("Rabbit"));
 
                     //If set true, when the core thread is idle, it will also be closed after "keepAliveTime".
                     executor.allowCoreThreadTimeOut(true);

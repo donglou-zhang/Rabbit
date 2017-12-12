@@ -1,6 +1,7 @@
 package com.rabbit.zl.serverStub;
 
 import com.rabbit.zl.common.exception.RpcException;
+import com.rabbit.zl.rpc.executor.CustomizedThreadFactory;
 import com.rabbit.zl.rpc.executor.ServerRpcExecutorFactory;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,27 +33,36 @@ public class ServerRpcProcessor implements RpcProcessor{
 
     private RpcMessage response;
 
+    private Object lock = new Object();
+
     public ServerRpcProcessor() {
         executorFactory = new ServerRpcExecutorFactory();
-        timeoutExecutor = Executors.newFixedThreadPool(3);
+//        timeoutExecutor = Executors.newFixedThreadPool(3);
+        timeoutExecutor = Executors.newCachedThreadPool(new CustomizedThreadFactory("Rabbit-timeout"));
     }
 
     @Override
     public RpcMessage process(RpcMessage request, RpcChannel channel) {
+        if(request == null)
+            throw new RpcException("Received request message is null, should not dispatch thread to process");
         //TODO
-//        MonitoringExecutorService executor = null;
-//        executor = executorFactory.getMonitorExecutor(request.getApplication() + "/" + request.getRpcInterface().getName());
+        MonitoringExecutorService executor;
+        executor = executorFactory.getMonitorExecutor(request.getApplication() + "/" + request.getRpcInterface().getName());
 
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+//        ExecutorService executor = Executors.newFixedThreadPool(2);
 
+        LOGGER.debug("Server processor begin to dispatch a thread to handle task...");
         executor.execute(new ProcessTask(request, channel));
-        LOGGER.debug("Server processor dispatch thread to handle task");
-        try {
-            Thread.sleep(2000);
-            System.out.println("ServerRpcProcessor: Wait 2000ms, after process get the response: "+response);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+
+        //wait the handle thread to execute result
+        synchronized (lock) {
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
+
         return response;
     }
 
@@ -94,6 +104,11 @@ public class ServerRpcProcessor implements RpcProcessor{
                 if(request.isOneWay()) return;
 
                 response = future.get(getRpcTimeoutInMillis(request), TimeUnit.MICROSECONDS);
+
+                synchronized (lock) {
+                    lock.notifyAll();
+                }
+
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 response = RpcMessage.newResponseMessage(request.getMid(), new RpcException(RpcException.UNKNOWN, "unknown server error"));

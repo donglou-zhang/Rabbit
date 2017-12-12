@@ -104,11 +104,8 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
         }
         System.out.println("register service finish, has registered " + serviceRegisterCount + " services.");
 
-        new Thread() {
-            public void run() {
-                acceptor.listen();
-            }
-        }.start();
+        //After register all the service, start listening port
+        startService();
     }
 
     @Override
@@ -124,5 +121,13 @@ public class RpcServer implements ApplicationContextAware, InitializingBean{
                 rpcServiceList.add(rpcInterface+"&"+version+"&"+String.valueOf(weight));
             }
         }
+    }
+
+    private void startService() {
+        new Thread() {
+            public void run() {
+                acceptor.listen();
+            }
+        }.start();
     }
 }

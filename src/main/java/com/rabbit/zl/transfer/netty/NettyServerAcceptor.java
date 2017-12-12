@@ -49,6 +49,7 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
     }
 
     public void listen() {
+        System.out.println("NettyServerAcceptor: carry out listen()");
         //to accept the incoming connections, once it get the connection,it will registered it to workerGroup
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();//to handle the accepted connection
@@ -67,7 +68,6 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
 
             ChannelFuture future = bootstrap.bind(serverHost, serverPort).sync();
             System.out.println("NettyServerAcceptor: start listening address["+serverHost+" : "+serverPort+"] ...");
-
             LOGGER.debug("Server started on address [{} : {}]", serverHost, serverPort);
 
             future.channel().closeFuture().sync();
@@ -88,16 +88,11 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
     class ServerResultHandler extends ChannelInboundHandlerAdapter {
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-            if(msg!=null) {
-                try{
-                    System.out.println("NettyServerAcceptor: Before processing, request message[" + msg.toString() + "]");
-                    RpcMessage response = processor.process((RpcMessage) msg, new DefaultRpcChannel());
-                    System.out.println("NettyServerAcceptor: After processing, response message[" + response.toString() + "]");
-                    ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
-                }catch(Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            System.out.println("NettyServerAcceptor: Before processing, request message[" + msg.toString() + "]");
+            RpcMessage response = processor.process((RpcMessage) msg, new DefaultRpcChannel());
+            //In server side, ChannelFutureListener.CLOSE will close connection with client initiative
+//            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+            ctx.writeAndFlush(response);
         }
 
         @Override

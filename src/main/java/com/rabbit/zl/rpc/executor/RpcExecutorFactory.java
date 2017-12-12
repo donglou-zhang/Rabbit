@@ -19,7 +19,5 @@ public interface RpcExecutorFactory {
      */
     MonitoringExecutorService getMonitorExecutor(String service) throws RpcException;
 
-    void setDiscovery(RpcDiscovery discovery);
-
     void shutdown();
 }
