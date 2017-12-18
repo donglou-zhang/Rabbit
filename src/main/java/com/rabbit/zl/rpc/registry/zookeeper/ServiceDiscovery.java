@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
  * @author Vincent
  * Created  on 2017/11/12.
  */
-@Component("serviceDiscovery")
 public class ServiceDiscovery implements RpcDiscovery{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceDiscovery.class);
@@ -40,10 +39,6 @@ public class ServiceDiscovery implements RpcDiscovery{
     @Getter @Setter private int registerPort;
 
     @Getter @Setter private String defaultApplication;
-
-    public ServiceDiscovery() {
-
-    }
 
     public ServiceDiscovery(String registryHost, int registryPort, String defaultApplication) {
             this.registerHost = registryHost;

@@ -4,6 +4,9 @@ import com.rabbit.zl.common.exception.RpcException;
 import com.rabbit.zl.rpc.protocol.model.RpcMessage;
 
 /**
+ * Used in client side
+ * RpcConnector takes charge for sending data to server and receiving response from server
+ *
  * @author Vincent
  * Created on 2017/11/13.
  */

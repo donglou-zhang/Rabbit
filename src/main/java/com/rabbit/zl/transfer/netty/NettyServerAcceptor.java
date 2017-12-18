@@ -18,6 +18,8 @@ import com.rabbit.zl.rpc.transmission.DefaultRpcChannel;
 import com.rabbit.zl.serverStub.RpcProcessor;
 
 /**
+ * Acceptor: server side
+ * Use netty to receive data(listening port and check if there is data) and send handled result to client
  *
  * @author Vincent
  * Created  on 2017/11/13.
@@ -50,7 +52,6 @@ public class NettyServerAcceptor extends AbstractRpcAcceptor{
     }
 
     public void listen() {
-        System.out.println("NettyServerAcceptor: carry out listen()");
         //to accept the incoming connections, once it get the connection,it will registered it to workerGroup
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();//to handle the accepted connection

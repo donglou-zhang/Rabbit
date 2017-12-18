@@ -3,6 +3,9 @@ package com.rabbit.zl.rpc.transmission;
 import com.rabbit.zl.serverStub.RpcProcessor;
 
 /**
+ * Used in server side
+ * RpcAcceptor takes charge for receiving data from client and sending handled result to client
+ *
  * @author Vincent
  * Created on 2017/11/13.
  */

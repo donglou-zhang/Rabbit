@@ -17,7 +17,6 @@ import com.rabbit.zl.rpc.registry.RpcRegistryService;
  * @author Vincent
  * Created  on 2017/11/12.
  */
-@Component("serviceRegistry")
 public class ServiceRegistry implements RpcRegistry {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceRegistry.class);

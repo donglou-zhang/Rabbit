@@ -7,6 +7,9 @@ import com.rabbit.zl.rpc.registry.example.service.TestOperator;
 import org.junit.Test;
 
 /**
+ * Test for {@link RpcClient}
+ * Through invoking getBean(), test the framework is working correctly or not
+ *
  * @author Vincent
  * Created  on 2017/12/04.
  */

@@ -1,9 +1,7 @@
 package com.rabbit.zl.client;
 
 import com.rabbit.zl.clientStub.ClientRpcInvoker;
-import com.rabbit.zl.rpc.registry.zookeeper.ServiceDiscovery;
-import com.rabbit.zl.rpc.transmission.DefaultRpcAcceptor;
-import com.rabbit.zl.rpc.transmission.RpcConnector;
+import com.rabbit.zl.rpc.registry.RpcDiscovery;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -11,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.rabbit.zl.rpc.invoke.RpcInvoker;
 import com.rabbit.zl.rpc.transmission.DefaultRpcConnector;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
  * Rpc Client provides the method to get remote service instance
@@ -25,13 +23,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
  * @author Vincent
  * Created  on 2017/11/10.
  */
+@Component("rpcClient")
 public class RpcClient {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
-
-    @Getter @Setter private String remoteHost;
-
-    @Getter @Setter private int remotePort;
 
     @Getter @Setter private RpcProxyFactory proxyFactory;
 
@@ -40,13 +35,15 @@ public class RpcClient {
     @Getter @Setter private DefaultRpcConnector connector;
 
     @Getter @Setter
-    private ServiceDiscovery serviceDiscovery;
+    private RpcDiscovery serviceDiscovery;
 
-    public RpcClient() {
+    @Autowired
+    public RpcClient(RpcDiscovery discovery) {
+        this.serviceDiscovery = discovery;
+
         proxyFactory = new DefaultRpcProxyFactory();
         invoker = new ClientRpcInvoker();
         connector = new DefaultRpcConnector();
-        serviceDiscovery = new ServiceDiscovery("127.0.0.1", 2181, "Rabbit");
         init();
     }
 
@@ -58,6 +55,15 @@ public class RpcClient {
         LOGGER.debug("[RABBIT] Rpc client init complete.");
     }
 
+    /**
+     * User invoke this method to send request to remote server. After receiving request, the server will handle the request
+     * Then server will send result back to client.
+     * Client gets the result just like invoking local method
+     *
+     * @param rpcInterface
+     * @param <T>
+     * @return
+     */
     public <T> T getBean(Class<T> rpcInterface) {
         return proxyFactory.getProxy(rpcInterface);
     }

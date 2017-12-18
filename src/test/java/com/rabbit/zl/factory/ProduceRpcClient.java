@@ -1,6 +1,7 @@
 package com.rabbit.zl.factory;
 
 import com.rabbit.zl.client.RpcClient;
+import com.rabbit.zl.rpc.registry.zookeeper.ServiceDiscovery;
 
 /**
  * Test for producing {@link RpcClient} instance
@@ -11,7 +12,8 @@ import com.rabbit.zl.client.RpcClient;
 public class ProduceRpcClient {
 
     public static RpcClient getRpcClient() {
-        RpcClient client = new RpcClient();
+        ServiceDiscovery discovery = new ServiceDiscovery("127.0.0.1", 2181, "Rabbit");
+        RpcClient client = new RpcClient(discovery);
         return client;
     }
 }

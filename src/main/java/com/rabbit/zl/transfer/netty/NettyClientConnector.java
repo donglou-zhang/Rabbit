@@ -15,6 +15,8 @@ import com.rabbit.zl.rpc.protocol.model.RpcMessage;
 import com.rabbit.zl.rpc.transmission.AbstractRpcConnector;
 
 /**
+ * Connector: client side
+ * Use netty to send data to server and wait for response
  *
  * @author Vincent
  * Created  on 2017/11/13.
@@ -73,7 +75,6 @@ public class NettyClientConnector extends AbstractRpcConnector {
 
             if(this.future == null || !this.future.channel().isActive()) {
                 connect();
-                System.out.println("NettyClientConnector: in send(), reconnect");
             }
 
             try {
@@ -96,7 +97,6 @@ public class NettyClientConnector extends AbstractRpcConnector {
         try {
             if(this.future == null || !this.future.channel().isActive()) {
                 this.future = bootstrap.connect(this.remoteHost, this.remotePort).sync();
-                System.out.println("NettyClientConnector: connect[" + this.remoteHost + ":" + this.remotePort + "]");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,7 +125,6 @@ public class NettyClientConnector extends AbstractRpcConnector {
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
             this.response = (RpcMessage) msg;
 
-            System.out.println("NettyClientConnector: response: "+response);
             // Get the response, and it should notify the waiting thread
             synchronized (lock) {
                 lock.notifyAll();
