@@ -24,40 +24,67 @@ RPC不是某一种专门的协议，而可以认为是一种编程模式，把�
 3、Rpc与动态代理
 Rpc中，动态代理是非常重要的一个内容，下面我将以Jdk动态代理的方式陈述一下Client端的调用过程。待本项目完成后，客户端使用流程如下：
 
+
     (1) RpcClient client = new RpcClient();
 
-如果我们希望调用服务端的DemoService类的helloWord()方法，则
-
->     getProxy(Class<?> rpcInterface)使用了Jdk的动态代理，内部调用了Proxy.newProxyInstance方法
-
+>     首先，new一个客户端。客户端是用于向用户提供API的，例如我们希望调用远程服务器上提供的DemoService类的helloWord()方法，则
 
     (2) DemoService service = client.getProxy(DemoService.class);
 
->     newProxyInstance这个方法有三个参数
+>     getProxy()使用了Jdk的动态代理，内部实际调用了Proxy.newProxyInstance方法
+
+>     newProxyInstance()这个方法有三个参数
 >     @ loader, 定义了一个ClassLoader对象，用于加载生成的代理对象
 >     @ interfaces，给需要代理的对象提供一组接口，可认为该对象实现了这些接口，因此可调用这些接口中的方法
 >     @ h，一个InvocationHandler对象，表示当这个动态代理对象在调用方法时，会关联到哪一个InvocationHandler上
 
-    (3) Proxy.newProxyInstance(Classloader, Class<?>[] interfaces, InvocationHandler h);
+    (3) service.helloWorld("Hello, World");
+>     当调用helloWord方法时，系统会根据newProxyInstance中关联的InvocationHandler，调用它的invoke()方法，即调用具体所需的方法时，触发invoke()
 
->     当调用helloWord方法时，实则会根据(3)中关联的InvocationHandler，调用它的invoke()方法
-
-    (4) service.helloWorld("Hello, World");
-
->     InvocationHandler的invoke方法会调用RpcInvoker的invoke方法，这是因为客户端和服务端是不同的逻辑：
+    (4) Class RpcInvocationHandler: Object invoke(Object proxy, Method method, Object[] args) {
+        ...
+        rpcInvoker.invoker(request);
+        ...
+    }
+>     客户端和服务端均使用同一个InvocationHandler类，这是因为invoke方法会去调用RpcInvoker的invoke方法，因此只需要将客户端RpcInvoker和服务器端RpcInvoker实现的不同即可。
+>     该invoke方法有三个参数
 >     @ proxy, 所代理的真实对象(服务端调用时的ServiceBeanImpl，而不是接口)
 >     @ method，所要调用代理的某个方法
 >     @ args，调用方法时传入的参数
 
-    (5) Class RpcInvocationHandler: Object invoke(Object proxy, Method method, Object[] args) {
-    	...
-    	rpcInvoker.invoker(request);
-    	...
+    (5) Class ClientRpcInvoker: Object invoke(Object request) {
+        ...
+        connector.send(request);
+        ...
     }
 
->     客户端和服务端的逻辑不一样：
+>     客户端和服务端的RpcInvoker逻辑不一样：
 >     客户端，需要通过connector将request消息发送给服务端
 >     服务端，接收到客户端传入的信息，通过method.invoke()调用真实对象，执行方法，获得结果并返回给服务端
 
-    (6) Class RpcInvoker: RpcMessage invoke();
 
+4、代码目录结构：
+client：服务消费方，提供client，供用户调用相关API（目前主要就是getBean这个接口）。
+
+clientStub：负责编码消息体，并“发现”服务及其相关信息，比如服务提供方的IP地址，然后发送消息体。
+
+common：常用工具包，主要包括序列化、压缩、缓冲等。
+
+rpc: 最重要的部分,包含以下几个模块
+> executor：线程池，服务端可获取线程用于处理来自客户端的请求；
+
+> invoke： 定义了客户端和服务端需要使用的RpcInvoker接口等；
+
+> monitor: 监控，主要用于监控当前任务执行情况，包括已完成、正在执行、等待执行等（目前暂未使用）；
+
+> protocol：消息体，或者成为协议，用于定义客户端与服务器通信的数据格式；
+
+> registry：用于向第三方zookeeper注册和发现服务；
+
+> transmission：提供统一的数据通信调用接口（这样可以允许底层通信方式采用多种手段）
+
+server：扫描自定义的服务并向第三方进行注册，启动监听线程；
+
+serverStub：主要负责解码消息体，然后去线程池获取线程，处理完请求后返回结果；
+
+transfer：主要为具体的底层通信方法的实现，目前只有Netty这一种方法；后期还考虑自定义实现NIO方式来实现通信。
