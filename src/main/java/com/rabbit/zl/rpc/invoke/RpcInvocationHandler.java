@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
- * When a method is invoked on a proxy instance, the method invocation is encoded and dispatched to the invoke method of its invocation handler
+ * When a method is invoked on a proxy instance, the method invocation is encoded and dispatched to the invoke() method of its invocation handler
  *
  * @author Vincent
  * Created  on 2017/11/13.

@@ -63,6 +63,7 @@ public class ByteUtil {
         return b;
     }
 
+    //高位在前，低位在后
     public static final void intToBytes(int i, byte[] bytes, int offset) {
         bytes[offset+3] = (byte)i;
         bytes[offset+2] = (byte)(i>>>8);

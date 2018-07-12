@@ -119,7 +119,6 @@ public class ServerRpcProcessor implements RpcProcessor{
                 e.printStackTrace();
                 response = RpcMessage.newResponseMessage(request.getMid(), new RpcException(RpcException.SERVER_TIMEOUT, "server timeout"));
             }
-
         }
     }
 }

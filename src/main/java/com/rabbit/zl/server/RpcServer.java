@@ -17,11 +17,9 @@ import com.rabbit.zl.rpc.executor.ServerRpcExecutorFactory;
 import com.rabbit.zl.rpc.invoke.RpcInvoker;
 import com.rabbit.zl.rpc.registry.RpcRegistry;
 import com.rabbit.zl.rpc.registry.RpcService;
-import com.rabbit.zl.rpc.transmission.RpcAcceptor;
 import com.rabbit.zl.serverStub.RpcProcessor;
 import com.rabbit.zl.serverStub.ServerRpcInvoker;
 import com.rabbit.zl.serverStub.ServerRpcProcessor;
-import com.rabbit.zl.transfer.netty.NettyServerAcceptor;
 
 import java.util.ArrayList;
 import java.util.HashMap;

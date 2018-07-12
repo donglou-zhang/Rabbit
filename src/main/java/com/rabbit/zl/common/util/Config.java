@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * @author Vincent
  * Created  on 2017/12/18.
  */
-@Component("rpcConfig")
+//@Component("rpcConfig")
 public class Config {
 
     @Getter

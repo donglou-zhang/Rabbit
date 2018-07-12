@@ -6,7 +6,11 @@
 
     <groupId>com.rabbit.zl</groupId>
     <artifactId>Rabbit</artifactId>
+    <packaging>pom</packaging>
     <version>1.0</version>
+    <modules>
+        <module>Rpc2</module>
+    </modules>
 
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok-maven-plugin -->
