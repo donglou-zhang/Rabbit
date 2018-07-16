@@ -12,6 +12,8 @@ public class ClientConfig {
     private String remoteHost;
     @Getter @Setter
     private int remotePort;
+    @Getter @Setter
+    protected long connectTimeoutMillis = 6000;
 
     @Getter @Setter
     private String registryHost;

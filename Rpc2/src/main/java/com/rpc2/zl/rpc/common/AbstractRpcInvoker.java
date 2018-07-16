@@ -3,6 +3,7 @@ package com.rpc2.zl.rpc.common;
 import com.google.common.collect.Lists;
 import com.rpc2.zl.rpc.protocol.RpcRequest;
 import com.rpc2.zl.rpc.filter.RpcFilter;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Map;
 /**
  * Created by Vincent on 2018/7/11.
  */
-public abstract class AbstractRpcInvoker<T> implements RpcInvoker{
+public abstract class AbstractRpcInvoker<T> extends SimpleChannelInboundHandler<T> implements RpcInvoker{
 
     private final Map<String, Object> handlerMap;
 
@@ -54,10 +55,27 @@ public abstract class AbstractRpcInvoker<T> implements RpcInvoker{
         return invocation;
     }
 
+    /**
+     * 构建filter链，（此处filter没有排序），从后往前依次处理调用
+     * @param invoker
+     * @return
+     */
     public RpcInvoker buildRpcInvokerChain(final RpcInvoker invoker) {
         RpcInvoker last = invoker;
         List<RpcFilter> filters = Lists.newArrayList(this.filterMap.values());
-        //TODO
+
+        if(filters.size() > 0) {
+            for(int i=filters.size()-1; i>=0; i--) {
+                final RpcFilter filter = filters.get(i);
+                final RpcInvoker next = last;
+                last = new RpcInvoker() {
+                    @Override
+                    public Object invoke(RpcInvocation invocation) {
+                        return filter.invoke(next, invocation);
+                    }
+                };
+            }
+        }
         return last;
     }
 
