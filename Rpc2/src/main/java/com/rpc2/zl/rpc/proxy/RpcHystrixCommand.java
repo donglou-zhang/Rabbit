@@ -1,9 +1,13 @@
 package com.rpc2.zl.rpc.proxy;
 
 import com.netflix.hystrix.*;
+import com.rpc2.zl.client.RpcClientInvoker;
+import com.rpc2.zl.client.RpcClientInvokerManager;
 import com.rpc2.zl.client.RpcReference;
+import com.rpc2.zl.rpc.common.RpcInvoker;
 import com.rpc2.zl.rpc.protocol.RpcRequest;
 import com.rpc2.zl.rpc.config.ClientConfig;
+import com.rpc2.zl.rpc.protocol.RpcResponseFuture;
 
 import java.lang.reflect.Method;
 import java.util.UUID;
@@ -56,11 +60,19 @@ public class RpcHystrixCommand extends HystrixCommand{
         if(this.reference != null) {
             request.setMaxExecutesCount(this.reference.cliMaxExecuteCount());
         }
-
         request.setContextParameters(RpcContext.getRpcContext().getContextParams());
 
+        RpcClientInvoker clientInvoker = RpcClientInvokerManager.getInstance(clientConfig).getClientInvoker();
+        clientInvoker.setRpcRequest(request);
 
+        RpcInvoker rpcInvoker = clientInvoker.buildRpcInvokerChain(clientInvoker);
+        RpcResponseFuture responseFuture = (RpcResponseFuture) rpcInvoker.invoke(clientInvoker.buildRpcInvocation(request));
 
-        return null;
+        if(this.reference.isSync()) {
+            return responseFuture.getResult(3000);
+        } else {
+            RpcContext.getRpcContext().setResponseFuture(responseFuture);
+            return null;
+        }
     }
 }

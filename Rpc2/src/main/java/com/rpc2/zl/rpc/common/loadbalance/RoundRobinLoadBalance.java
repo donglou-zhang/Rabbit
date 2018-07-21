@@ -20,7 +20,6 @@ public class RoundRobinLoadBalance implements LoadBalanceService {
         return this.roundRobin;
     }
 
-    @Override
     public int index(int size) {
         return ((this.getRoundRobinValue().get() + size) % size);
     }

@@ -17,10 +17,6 @@ public class JdkSerializer implements RpcSerializer {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(JdkSerializer.class);
 
-    public byte type() {
-        return 2;
-    }
-
     /**
      * serialize and compress，to reduce network traffic
      *

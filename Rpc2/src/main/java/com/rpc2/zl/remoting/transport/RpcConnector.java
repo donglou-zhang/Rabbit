@@ -12,4 +12,8 @@ public interface RpcConnector {
     void connect(ClientConfig config);
 
     RpcResponseFuture send(RpcRequest request);
+
+    void close(Object obj);
+
+    void closeAll();
 }

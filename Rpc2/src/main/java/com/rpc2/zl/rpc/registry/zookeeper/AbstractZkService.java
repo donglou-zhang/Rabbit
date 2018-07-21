@@ -7,7 +7,7 @@ import org.I0Itec.zkclient.ZkClient;
  */
 public abstract class AbstractZkService {
 
-    protected ZkClient buildZkClient(String registryHost, int registryPort) {
-        return new ZkClient(registryHost + ":" + String.valueOf(registryPort));
+    protected ZkClient buildZkClient(String host, int port) {
+        return new ZkClient(host + ":" + String.valueOf(port));
     }
 }

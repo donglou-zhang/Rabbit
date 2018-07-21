@@ -1,19 +1,22 @@
 package com.rpc2.zl.client;
 
+import com.rpc2.zl.remoting.serialize.SerializerInstance;
 import com.rpc2.zl.remoting.transport.RpcConnector;
 import com.rpc2.zl.rpc.common.AbstractRpcInvoker;
 import com.rpc2.zl.rpc.common.RpcInvocation;
 import com.rpc2.zl.rpc.filter.RpcFilter;
 import com.rpc2.zl.rpc.protocol.RpcMessage;
+import com.rpc2.zl.rpc.protocol.RpcMessageHeader;
 import com.rpc2.zl.rpc.protocol.RpcRequest;
 import com.rpc2.zl.rpc.protocol.RpcResponseFuture;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Vincent on 2018/7/11.
  */
-public class RpcClientInvoker extends AbstractRpcInvoker<RpcMessage>{
+public class RpcClientInvoker extends AbstractRpcInvoker{
 
     //InheritableThreadLocal适用于把数据从父线程传递到子线程；但为了保护线程安全性，应该只对不可变对象使用InheritableThreadLocal
     private final ThreadLocal<RpcRequest> rpcRequestThreadLocal = new InheritableThreadLocal<>();

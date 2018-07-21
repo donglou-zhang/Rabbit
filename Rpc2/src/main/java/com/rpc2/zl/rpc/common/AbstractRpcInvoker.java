@@ -11,11 +11,13 @@ import java.util.Map;
 /**
  * Created by Vincent on 2018/7/11.
  */
-public abstract class AbstractRpcInvoker<T> extends SimpleChannelInboundHandler<T> implements RpcInvoker{
+public abstract class AbstractRpcInvoker implements RpcInvoker{
 
-    private final Map<String, Object> handlerMap;
+    private Map<String, Object> handlerMap;
 
-    private final Map<String, RpcFilter> filterMap;
+    private Map<String, RpcFilter> filterMap;
+
+    protected AbstractRpcInvoker() {}
 
     protected AbstractRpcInvoker(Map<String, Object> handlerMap, Map<String, RpcFilter> filterMap) {
         this.handlerMap = handlerMap;
