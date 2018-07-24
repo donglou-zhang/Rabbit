@@ -69,9 +69,10 @@ public class RpcHystrixCommand extends HystrixCommand{
         RpcResponseFuture responseFuture = (RpcResponseFuture) rpcInvoker.invoke(clientInvoker.buildRpcInvocation(request));
 
         if(this.reference.isSync()) {
-            return responseFuture.getResult(3000);
+            return responseFuture.get();
         } else {
             RpcContext.getRpcContext().setResponseFuture(responseFuture);
+            responseFuture.executeAfterDone(responseFuture.getResponse());
             return null;
         }
     }

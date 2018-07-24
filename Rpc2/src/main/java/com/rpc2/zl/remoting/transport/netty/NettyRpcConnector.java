@@ -97,7 +97,7 @@ public class NettyRpcConnector extends AbstractHandler<RpcMessage> implements Rp
         RpcResponseFuture responseFuture = pendingRPC.get(requestId);
         if(responseFuture != null) {
             pendingRPC.remove(requestId);
-            responseFuture.executeAfterDone(response);
+            responseFuture.setResponse(response);
         }
     }
 
